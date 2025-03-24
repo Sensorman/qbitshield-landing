@@ -16,7 +16,7 @@ export default function Home() {
           Quantum-Safe Key Infrastructure
         </h2>
         <p className="text-lg mb-6 text-gray-300">
-          QbitShield delivers cryptographically secure, entropy-rich quantum keys via our PB-QKD API. Backed by real hardware validation on IonQ Aria-1, we bring structured randomness to your security stack.
+          QbitShield delivers cryptographically secure, high-entropy quantum keys through a proprietary QKD protocol. Validated on real quantum hardware (IonQ Aria-1), our API enables advanced quantum-safe key generation with enhanced randomness and security.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6">
