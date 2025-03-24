@@ -1,20 +1,18 @@
+// pages/index.tsx or index.js
+
+import Image from 'next/image';
+
 export default function Home() {
   return (
-    
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
-       import Image from 'next/image'; // at the top of your file
-
-...
-
-<Image
-  src="app/public/Black-QbitShieldVectorLogo.png
-"
-  alt="QbitShield Logo"
-  width={150}
-  height={50}
-  priority
-/>
+        <Image
+          src="/Black-QbitShieldVectorLogo.png"
+          alt="QbitShield Logo"
+          width={150}
+          height={50}
+          priority
+        />
 
         <a
           href="https://theqbitshield-api-258062438248.us-central1.run.app/docs"
