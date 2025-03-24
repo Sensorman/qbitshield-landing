@@ -1,8 +1,20 @@
 export default function Home() {
   return (
+    
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-green-400">QbitShield</h1>
+       import Image from 'next/image'; // at the top of your file
+
+...
+
+<Image
+  src="/logo.png"
+  alt="QbitShield Logo"
+  width={150}
+  height={50}
+  priority
+/>
+
         <a
           href="https://theqbitshield-api-258062438248.us-central1.run.app/docs"
           className="text-sm underline text-gray-300 hover:text-white"
