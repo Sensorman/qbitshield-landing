@@ -8,7 +8,8 @@ export default function Home() {
 ...
 
 <Image
-  src="/logo.png"
+  src="app/public/Black-QbitShieldVectorLogo.png
+"
   alt="QbitShield Logo"
   width={150}
   height={50}
