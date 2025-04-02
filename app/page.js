@@ -29,14 +29,14 @@ export default function Home() {
           enhanced randomness and security.
         </p>
 
-        {/* 🔐 3-Tier Pricing Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* 💸 Pricing Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
           {/* Free Tier */}
           <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-6 text-center shadow hover:shadow-lg transition">
             <h3 className="text-2xl font-semibold mb-2">Free Tier</h3>
             <p className="text-zinc-400 mb-4">Get started with up to 25 secure quantum key generations per month.</p>
             <p className="text-3xl font-bold mb-4">$0<span className="text-sm font-normal text-zinc-400">/mo</span></p>
-            <a href="/docs" className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Start Free</a>
+            <a href="/login" className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Start Free</a>
           </div>
 
           {/* Pro Tier */}
@@ -45,7 +45,7 @@ export default function Home() {
             <p className="text-zinc-400 mb-4">Scale up to 10,000 key requests per month with premium support.</p>
             <p className="text-3xl font-bold mb-4">$99<span className="text-sm font-normal text-zinc-400">/mo</span></p>
             <a
-              href="https://buy.stripe.com/YOUR_PRO_CHECKOUT_LINK"
+              href="https://buy.stripe.com/test_9AQaIB67hc3nfWU9AA"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -68,7 +68,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Join Waitlist */}
+        {/* ✉️ Join Waitlist Form */}
         <form
           action="https://formspree.io/f/myzejkba"
           method="POST"
