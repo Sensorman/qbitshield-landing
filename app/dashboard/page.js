@@ -1,11 +1,54 @@
+"use client";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Dashboard() {
+  const [usage, setUsage] = useState({
+    tier: '...',
+    usage_count: 0,
+    limit: 0,
+    remaining: 0,
+    api_key: 'sk_test_XXXXXXXXXXXXXXXX'
+  });
+
+  useEffect(() => {
+    async function fetchUsage() {
+      try {
+        const res = await fetch('/api/usage', {
+          headers: {
+            'api-key': 'test-api-key'
+          }
+        });
+        const data = await res.json();
+        setUsage({
+          tier: data.tier || 'free',
+          usage_count: data.usage_count || 0,
+          limit: data.limit || 0,
+          remaining: data.remaining || 0,
+          api_key: data.api_key || 'sk_test_XXXXXXXXXXXXXXXX',
+        });
+      } catch (err) {
+        console.error('Failed to load usage:', err);
+      }
+    }
+    fetchUsage();
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
-        <Image src="/Black-QbitShieldVectorLogo.png" alt="QbitShield Logo" width={150} height={50} priority />
-        <a href="/" className="text-sm underline text-gray-300 hover:text-white">Home</a>
+        <Image
+          src="/Black-QbitShieldVectorLogo.png"
+          alt="QbitShield Logo"
+          width={150}
+          height={50}
+          priority
+        />
+        {/* ✅ Fix: Link instead of <a> */}
+        <Link href="/" className="text-sm underline text-gray-300 hover:text-white">
+          Home
+        </Link>
       </header>
 
       <main className="max-w-3xl mx-auto p-8">
@@ -13,22 +56,22 @@ export default function Dashboard() {
 
         <div className="bg-zinc-900 p-6 rounded mb-8 border border-zinc-700">
           <h2 className="text-xl font-semibold mb-2">Your API Key</h2>
-          <p className="bg-gray-800 p-2 rounded text-sm font-mono select-all">sk_test_XXXXXXXXXXXXXXXX</p>
+          <p className="bg-gray-800 p-2 rounded text-sm font-mono select-all">{usage.api_key}</p>
           <p className="text-zinc-400 text-sm mt-2">Use this key with the official QbitShield SDK to start generating quantum keys.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           <div className="bg-zinc-800 p-4 rounded">
             <p className="text-zinc-400 text-sm">Tier</p>
-            <p className="text-2xl font-semibold">Free</p>
+            <p className="text-2xl font-semibold">{usage.tier}</p>
           </div>
           <div className="bg-zinc-800 p-4 rounded">
             <p className="text-zinc-400 text-sm">Used</p>
-            <p className="text-2xl font-semibold">4 / 25</p>
+            <p className="text-2xl font-semibold">{usage.usage_count} / {usage.limit}</p>
           </div>
           <div className="bg-zinc-800 p-4 rounded">
             <p className="text-zinc-400 text-sm">Remaining</p>
-            <p className="text-2xl font-semibold">21</p>
+            <p className="text-2xl font-semibold">{usage.remaining}</p>
           </div>
         </div>
 
