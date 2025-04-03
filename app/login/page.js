@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -59,6 +60,7 @@ export default function LoginPage() {
           </p>
         )}
       </form>
+      <Link href="/" className="text-sm underline text-gray-300 hover:text-white">Home</Link>
     </div>
   );
 }
