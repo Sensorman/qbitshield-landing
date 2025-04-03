@@ -60,9 +60,12 @@ export default function LoginPage() {
           </p>
         )}
       </form>
-      <Link href="/" passHref>
-        <a className="text-sm underline text-gray-300 hover:text-white">Home</a>
-      </Link>
+
+      <div className="absolute bottom-4 left-0 right-0 text-center">
+        <Link href="/" className="text-sm underline text-gray-400 hover:text-white">
+          ← Back to Home
+        </Link>
+      </div>
     </div>
   );
 }
