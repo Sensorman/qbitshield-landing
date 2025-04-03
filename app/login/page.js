@@ -60,7 +60,9 @@ export default function LoginPage() {
           </p>
         )}
       </form>
-      <Link href="/" className="text-sm underline text-gray-300 hover:text-white">Home</Link>
+      <Link href="/" passHref>
+        <a className="text-sm underline text-gray-300 hover:text-white">Home</a>
+      </Link>
     </div>
   );
 }
