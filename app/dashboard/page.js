@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,18 +9,19 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [usage, setUsage] = useState(null);
   const router = useRouter();
+  const supabase = createBrowserClient();
 
   useEffect(() => {
-    const supabase = createBrowserClient();
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         router.push("/login");
       } else {
         setUser(session.user);
         fetchUsage();
       }
-    });
+    };
 
     const fetchUsage = async () => {
       try {
@@ -35,12 +36,14 @@ export default function Dashboard() {
         console.error("Failed to load usage:", err);
       }
     };
-  }, [router]); // ✅ Patch: Add router as a dependency
+
+    init();
+  }, [router, supabase]);
 
   if (!user || !usage) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-gray-400">🔐 Checking session and loading dashboard...</p>
+        <p className="text-gray-400">🔐 Logging in and loading dashboard...</p>
       </div>
     );
   }
