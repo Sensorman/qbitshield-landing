@@ -46,10 +46,11 @@ export async function POST(req) {
       to: [email],
       subject: 'Your Magic Login Link',
       html: `
-        <h2>🔐 Welcome to QbitShield</h2>
-        <p>Click below to log in securely to your dashboard and API key:</p>
-        <p><a href="{{ .ConfirmationURL }}" style="color: green;">Access Dashboard</a></p>
-      `,
+  <h2>🔐 Welcome to QbitShield</h2>
+  <p>Click below to log in securely to your dashboard and API key:</p>
+  <p><a href="${magicLink}" style="color: green;">Access Dashboard</a></p>
+`,
+
     });
 
     if (!sent?.id) {
