@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -20,11 +20,10 @@ export async function POST(req) {
     await supabase.from('users').insert([{ email, name, company, phone }]);
 
     // ✅ Generate magic login link
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
+    const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        redirectTo: 'https://qbitshield.com/dashboard',
+        emailRedirectTo: "https://www.qbitshield.com/dashboard"
       }
     });
 
@@ -53,8 +52,11 @@ export async function POST(req) {
 
     });
 
+    if (error) console.error("❌ Supabase magic link error:", error);
+
     if (!sent?.id) {
-      console.error("❌ Resend failed to send email:", sent);
+      console.error("❌ Resend failed to send email");
+      console.log("🧾 Resend response:", JSON.stringify(sent, null, 2));
       return new Response('Failed to send email', { status: 500 });
     }
 
