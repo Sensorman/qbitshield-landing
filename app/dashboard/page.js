@@ -10,7 +10,10 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [usage, setUsage] = useState(null);
   const router = useRouter();
-  const supabase = createBrowserClient();
+  const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
   useEffect(() => {
     const init = async () => {
