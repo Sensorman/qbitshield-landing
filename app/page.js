@@ -1,38 +1,5 @@
+"use client";
 
-"use client";  // 👈 This is the fix!
-
-import { useState } from 'react';
-
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await fetch("/api/auth/email-login", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-    });
-  };
-
-  return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-green-400">Sign In to Access Dashboard</h2>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
-        <input
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full px-4 py-2 bg-zinc-800 border border-zinc-600 rounded"
-        />
-        <button type="submit" className="w-full px-4 py-2 bg-green-500 text-black font-semibold rounded hover:bg-green-600">
-          Send Login Link
-        </button>
-      </form>
-    </div>
-  );
-}
 import Image from 'next/image';
 
 export default function Home() {
@@ -72,8 +39,8 @@ export default function Home() {
             <p className="text-zinc-400 mb-4">Get started with up to 25 secure quantum key generations per month.</p>
             <p className="text-3xl font-bold mb-4">$0<span className="text-sm font-normal text-zinc-400">/mo</span></p>
             <a href="/login" className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-  Start Free
-</a>
+              Start Free
+            </a>
           </div>
 
           {/* Pro Tier */}
