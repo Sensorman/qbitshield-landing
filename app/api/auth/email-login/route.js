@@ -16,10 +16,14 @@ export async function POST(req) {
   }
 
   try {
-    // Insert user into Supabase table
-    await supabase.from('users').insert([{ email, name, company, phone }]);
+    // ✅ Try inserting into 'users' table, but don't block if it fails
+    try {
+      await supabase.from('users').insert([{ email, name, company, phone }]);
+    } catch (insertError) {
+      console.warn('⚠️ Could not insert user:', insertError.message);
+    }
 
-    // Generate Supabase magic link
+    // ✅ Generate magic link
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -39,21 +43,19 @@ export async function POST(req) {
       return new Response('Failed to generate login link', { status: 500 });
     }
 
-    // Send magic link via Resend
     const sent = await resend.emails.send({
       from: 'Will Daoud <will@qbitshield.com>',
       to: [email],
       subject: 'Your Magic Login Link',
       html: `
-        <h2>🔐 Welcome to QbitShield</h2>
-        <p>Click below to log in securely to your dashboard and API key:</p>
-        <p><a href="${magicLink}" style="color: green;">Access Dashboard</a></p>
+        <h2>🔐 Magic Link</h2>
+        <p>Click below to sign in to your QbitShield dashboard and access your API key:</p>
+        <p><a href="${magicLink}">🔐 Access Dashboard</a></p>
       `,
     });
 
     if (!sent?.id) {
       console.error('❌ Resend failed to send email');
-      console.log('🧾 Resend response:', JSON.stringify(sent, null, 2));
       return new Response('Failed to send email', { status: 500 });
     }
 
