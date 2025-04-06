@@ -10,16 +10,13 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [usage, setUsage] = useState(null);
   const router = useRouter();
-  const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+  const supabase = createBrowserClient();
 
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
-      if (!session) {
+      if (!session?.user) {
         router.push("/login");
       } else {
         setUser(session.user);
@@ -42,7 +39,7 @@ export default function Dashboard() {
     };
 
     init();
-  }, [router, supabase]);
+  }, [router]);
 
   if (!user || !usage) {
     return (
