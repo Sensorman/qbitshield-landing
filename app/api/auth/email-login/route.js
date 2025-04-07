@@ -22,20 +22,19 @@ export async function POST(req) {
       .upsert([{ email, name, company, phone }], { onConflict: 'email' });
 
     // Generate Supabase magic link
-    const { data, error: signUpError } = await supabase.auth.signUp({
+    const { data, error: otpError } = await supabase.auth.signInWithOtp({
   email,
   options: {
-    emailRedirectTo: 'https://qbitshield.com/login',
-  },
-  channel: 'magiclink' // 👈 required to bypass password requirement
+    emailRedirectTo: 'https://qbitshield.com/login'
+  }
 });
 
-console.log("✅ Supabase signUp response:", data);
-console.error("❌ Supabase signUp error:", signUpError);
+console.log("📨 OTP response data:", data);
+console.error("❌ OTP error (if any):", otpError);
 
-if (signUpError || !data?.user) {
+if (otpError || !data?.action_link) {
   return new Response(
-    JSON.stringify({ error: 'Failed to sign up user', signUpError }),
+    JSON.stringify({ error: 'Failed to generate magic link', otpError }),
     { status: 500, headers: { 'Content-Type': 'application/json' } }
   );
 }
