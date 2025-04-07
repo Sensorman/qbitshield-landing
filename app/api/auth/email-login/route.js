@@ -23,11 +23,18 @@ export async function POST(req) {
 
     // Generate Supabase magic link
     const { data, error: otpError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: 'https://qbitshield.com/dashboard',
-      },
-    });
+  email,
+  options: {
+    emailRedirectTo: 'https://qbitshield.com/login', // ✅ FIXED
+  },
+});
+
+console.log("📨 OTP response data:", data);
+console.log("❌ OTP error (if any):", otpError);
+
+if (otpError || !data?.action_link) {
+  return new Response(JSON.stringify({ error: 'Failed to generate magic link', otpError }), { status: 500 });
+}
 
     if (otpError || !data?.action_link) {
       console.error('❌ Supabase OTP error:', otpError);
@@ -45,6 +52,12 @@ export async function POST(req) {
         <p><a href="${data.action_link}" style="color: green;">🔑 Access Dashboard</a></p>
       `,
     });
+
+    console.log("📧 Resend email response:", emailResponse);
+
+    if (!emailResponse?.id) {
+        return new Response(JSON.stringify({ error: 'Failed to send email', emailResponse }), { status: 500 });
+    }
 
     if (!emailResponse?.id) {
       console.error('❌ Resend failed:', emailResponse);

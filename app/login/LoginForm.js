@@ -18,23 +18,30 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes('access_token')) {
-      const parsed = new URLSearchParams(hash.substring(1));
-      const access_token = parsed.get('access_token');
-      const refresh_token = parsed.get('refresh_token');
+  const hash = window.location.hash;
+  console.log('🔍 Raw hash from URL:', hash); // Log raw hash
 
-      supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
-        if (!error) {
-          const redirectTo = searchParams.get('from') || '/dashboard';
-          router.replace(redirectTo);
-        } else {
-          console.error('❌ Failed to set session:', error);
-          router.replace('/login?error=auth');
-        }
-      });
-    }
-  }, []);
+  if (hash.includes('access_token')) {
+    const parsed = new URLSearchParams(hash.substring(1));
+    const access_token = parsed.get('access_token');
+    const refresh_token = parsed.get('refresh_token');
+
+    console.log('🧪 access_token:', access_token);
+    console.log('🧪 refresh_token:', refresh_token);
+
+    supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
+      if (!error) {
+        console.log('✅ Supabase session set successfully!');
+        const redirectTo = searchParams.get('from') || '/dashboard';
+        console.log('🔁 Redirecting to:', redirectTo);
+        router.replace(redirectTo);
+      } else {
+        console.error('❌ Failed to set Supabase session:', error);
+        router.replace('/login?error=session');
+      }
+    });
+  }
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
