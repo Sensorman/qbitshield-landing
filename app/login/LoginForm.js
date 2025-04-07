@@ -1,5 +1,3 @@
-// app/login/LoginForm.js
-
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -18,30 +16,24 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-  const hash = window.location.hash;
-  console.log('🔍 Raw hash from URL:', hash); // Log raw hash
+    const hash = window.location.hash;
+    if (hash.includes("access_token")) {
+      const params = new URLSearchParams(hash.substring(1));
+      const access_token = params.get("access_token");
+      const refresh_token = params.get("refresh_token");
 
-  if (hash.includes('access_token')) {
-    const parsed = new URLSearchParams(hash.substring(1));
-    const access_token = parsed.get('access_token');
-    const refresh_token = parsed.get('refresh_token');
+      console.log("🔍 URL Hash:", hash);
+      console.log("🔑 access_token:", access_token);
 
-    console.log('🧪 access_token:', access_token);
-    console.log('🧪 refresh_token:', refresh_token);
-
-    supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
-      if (!error) {
-        console.log('✅ Supabase session set successfully!');
-        const redirectTo = searchParams.get('from') || '/dashboard';
-        console.log('🔁 Redirecting to:', redirectTo);
-        router.replace(redirectTo);
-      } else {
-        console.error('❌ Failed to set Supabase session:', error);
-        router.replace('/login?error=session');
-      }
-    });
-  }
-}, []);
+      supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
+        if (error) {
+          router.replace("/login?error=session");
+        } else {
+          router.replace("/dashboard");
+        }
+      });
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
