@@ -26,7 +26,8 @@ export async function POST(req) {
   email,
   options: {
     emailRedirectTo: 'https://qbitshield.com/login'
-  }
+  },
+  channel: 'email' // 👈 tells Supabase to use magic link mode
 });
 
 console.log("✅ Supabase signUp response:", data);
