@@ -3,7 +3,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { createBrowserClient } from "@supabase/ssr";
-import { SupabaseProvider } from '../supabase-provider'; // if layout.js is inside /app
+import { SupabaseProvider } from './supabase-provider';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
