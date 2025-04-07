@@ -22,23 +22,32 @@ export async function POST(req) {
       .upsert([{ email, name, company, phone }], { onConflict: 'email' });
 
     // Generate Supabase magic link
-    const { data, error: otpError } = await supabase.auth.signInWithOtp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
   email,
   options: {
-    emailRedirectTo: 'https://qbitshield.com/login', // ✅ FIXED
-  },
+    emailRedirectTo: 'https://qbitshield.com/login'
+  }
 });
 
-console.log("📨 OTP response data:", data);
-console.log("❌ OTP error (if any):", otpError);
+console.log("✅ Supabase signUp response:", data);
+console.error("❌ Supabase signUp error:", signUpError);
 
-if (otpError || !data?.action_link) {
-  return new Response(JSON.stringify({ error: 'Failed to generate magic link', otpError }), { status: 500 });
+if (signUpError || !data?.user) {
+  return new Response(
+    JSON.stringify({ error: 'Failed to sign up user', signUpError }),
+    { status: 500, headers: { 'Content-Type': 'application/json' } }
+  );
 }
+
+    console.log("📨 OTP response data:", data);
+    console.log("❌ OTP error (if any):", otpError);
 
     if (otpError || !data?.action_link) {
       console.error('❌ Supabase OTP error:', otpError);
-      return new Response('Failed to generate magic link', { status: 500 });
+      return new Response(JSON.stringify({ error: 'Failed to generate magic link', otpError }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     // Send email with Resend
@@ -56,12 +65,8 @@ if (otpError || !data?.action_link) {
     console.log("📧 Resend email response:", emailResponse);
 
     if (!emailResponse?.id) {
-        return new Response(JSON.stringify({ error: 'Failed to send email', emailResponse }), { status: 500 });
-    }
-
-    if (!emailResponse?.id) {
       console.error('❌ Resend failed:', emailResponse);
-      return new Response('Failed to send email', { status: 500 });
+      return new Response(JSON.stringify({ error: 'Failed to send email', emailResponse }), { status: 500 });
     }
 
     return new Response(JSON.stringify({ ok: true }), {
