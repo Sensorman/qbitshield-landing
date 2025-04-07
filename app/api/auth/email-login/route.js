@@ -25,9 +25,9 @@ export async function POST(req) {
     const { data, error: signUpError } = await supabase.auth.signUp({
   email,
   options: {
-    emailRedirectTo: 'https://qbitshield.com/login'
+    emailRedirectTo: 'https://qbitshield.com/login',
   },
-  channel: 'email' // 👈 tells Supabase to use magic link mode
+  channel: 'magiclink' // 👈 required to bypass password requirement
 });
 
 console.log("✅ Supabase signUp response:", data);
