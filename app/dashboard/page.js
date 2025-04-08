@@ -1,24 +1,27 @@
 "use client";
 export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import LogoutButton from "@/components/LogoutButton"
+import LogoutButton from "@/components/LogoutButton";
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [usage, setUsage] = useState(null);
   const router = useRouter();
   const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
 
   useEffect(() => {
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
       if (!session?.user) {
         router.push("/login");
@@ -32,8 +35,8 @@ export default function Dashboard() {
       try {
         const res = await fetch("/api/usage", {
           headers: {
-            "api-key": "test-api-key"
-          }
+            "api-key": "test-api-key",
+          },
         });
         const data = await res.json();
         setUsage(data);
@@ -63,9 +66,12 @@ export default function Dashboard() {
           height={50}
           priority
         />
-        <Link href="/" className="text-sm underline text-gray-300 hover:text-white">
-          Home
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-sm underline text-gray-300 hover:text-white">
+            Home
+          </Link>
+          <LogoutButton />
+        </div>
       </header>
 
       <main className="max-w-3xl mx-auto p-8">
@@ -104,15 +110,4 @@ key = client.generate_key("your-api-key")`}
       </main>
     </div>
   );
-
-export default function DashboardPage() {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Welcome to your Dashboard</h1>
-      <p className="text-gray-300">You're successfully logged in.</p>
-      <LogoutButton />
-    </div>
-  )
-}
-
 }
