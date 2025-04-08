@@ -5,6 +5,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import LogoutButton from "@/components/LogoutButton"
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -103,4 +104,15 @@ key = client.generate_key("your-api-key")`}
       </main>
     </div>
   );
+
+export default function DashboardPage() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Welcome to your Dashboard</h1>
+      <p className="text-gray-300">You're successfully logged in.</p>
+      <LogoutButton />
+    </div>
+  )
+}
+
 }

@@ -1,46 +1,46 @@
+// app/signup/LoginForm.js
 'use client'
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
-import { FcGoogle } from "react-icons/fc"
 
-export default function LoginForm() {
+export default function SignupForm() {
   const router = useRouter()
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault()
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name }
+      }
+    })
+
     if (error) setError(error.message)
     else router.push("/dashboard")
   }
 
-  const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
-    if (error) setError(error.message)
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
-      <form onSubmit={handleLogin} className="w-full max-w-sm p-6 border border-gray-700 rounded bg-zinc-900 shadow space-y-4">
-        <h1 className="text-2xl font-bold text-center">Log In</h1>
+      <form onSubmit={handleSignup} className="w-full max-w-sm p-6 border border-gray-700 rounded bg-zinc-900 shadow space-y-4">
+        <h1 className="text-2xl font-bold text-center">Sign Up</h1>
 
+        <input type="text" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
         <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
         <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
 
         <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded">
-          Log In
+          Create Account
         </button>
 
-        <button type="button" onClick={handleGoogleLogin} className="flex items-center justify-center w-full px-4 py-2 bg-white text-black font-semibold rounded hover:bg-gray-200">
-          <FcGoogle className="mr-2 text-xl" /> Log in with Google
-        </button>
-
-        <p className="text-sm text-center text-gray-400">
-          Don’t have an account? <a href="/signup" className="text-blue-400 hover:underline">Sign up here</a>
-        </p>
+         <p className="text-sm text-center text-gray-400">
+            Already have an account? <a href="/login" className="text-blue-400 hover:underline">Log in here</a>
+         </p>
 
         {error && <p className="text-red-400 text-sm text-center">❌ {error}</p>}
       </form>
