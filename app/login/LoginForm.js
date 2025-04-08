@@ -18,14 +18,17 @@ export default function LoginForm() {
   }
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://qbitshield.com/dashboard'
-      }
-    })
-    if (error) setError(error.message)
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://qbitshield.com/auth/callback'
+    }
+  })
+
+  if (error) {
+    setError(error.message)
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
@@ -39,7 +42,11 @@ export default function LoginForm() {
           Log In
         </button>
 
-        <button type="button" onClick={handleGoogleLogin} className="flex items-center justify-center w-full px-4 py-2 bg-white text-black font-semibold rounded hover:bg-gray-200">
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="flex items-center justify-center w-full px-4 py-2 bg-white text-black font-semibold rounded hover:bg-gray-200"
+        >
           <FcGoogle className="mr-2 text-xl" /> Log in with Google
         </button>
 
