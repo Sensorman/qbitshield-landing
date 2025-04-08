@@ -61,6 +61,10 @@ export default function LoginForm() {
         </p>
 
         {error && <p className="text-red-400 text-sm text-center">❌ {error}</p>}
+
+        <p className="text-xs text-center text-gray-500 mt-4">
+              <a href="/privacy" className="hover:underline">Privacy Policy</a> • <a href="/terms" className="hover:underline">Terms of Service</a>
+        </p>
       </form>
     </div>
   )

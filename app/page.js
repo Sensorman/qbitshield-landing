@@ -107,6 +107,10 @@ export default function Home() {
 
       <footer className="text-center text-gray-500 text-sm py-6 border-t border-gray-700 mt-10">
         &copy; 2025 QbitShield LLC · Patent Pending
+
+        <p className="text-xs text-center text-gray-500 mt-4">
+          <a href="/privacy" className="hover:underline">Privacy Policy</a> • <a href="/terms" className="hover:underline">Terms of Service</a>
+        </p>
       </footer>
     </div>
   );
