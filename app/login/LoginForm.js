@@ -18,7 +18,12 @@ export default function LoginForm() {
   }
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://qbitshield.com/dashboard'
+      }
+    })
     if (error) setError(error.message)
   }
 
@@ -40,6 +45,12 @@ export default function LoginForm() {
 
         <p className="text-sm text-center text-gray-400">
           Don’t have an account? <a href="/signup" className="text-blue-400 hover:underline">Sign up here</a>
+        </p>
+
+        <p className="text-sm text-center text-gray-400">
+          <a href="#" onClick={() => alert('We’ll add reset password soon')} className="text-blue-400 hover:underline">
+          Forgot your password?
+          </a>
         </p>
 
         {error && <p className="text-red-400 text-sm text-center">❌ {error}</p>}
