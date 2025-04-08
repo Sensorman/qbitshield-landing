@@ -6,7 +6,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import LogoutButton from "@/components/LogoutButton";
+import LogoutButton from "@/components/LogoutButton"
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
