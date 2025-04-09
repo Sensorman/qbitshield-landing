@@ -27,15 +27,12 @@ export default function LoginForm() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
-      // Wait a short moment for Supabase session to persist
-      setTimeout(() => {
-        router.refresh() // Make sure middleware sees the session
-        router.push(from)
-      }, 250)
-    }
+  setError(error.message)
+  setLoading(false)
+} else {
+  console.log("✅ Login succeeded, redirecting to:", from)
+  router.push(from)
+}
 
     console.log("Login triggered", data)
 
