@@ -21,14 +21,28 @@ export default function LoginForm() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'https://qbitshield.com/auth/callback'
-    }
-  })
+      redirectTo: 'https://qbitshield.com/auth/callback', // This must match Google console
+    },
+  });
+  if (error) console.error("Google login failed:", error.message);
+};
+
+
+
+  const handleForgotPassword = async () => {
+  const email = prompt("Enter your email to reset password");
+  if (!email) return;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://qbitshield.com/reset-password',
+  });
 
   if (error) {
-    setError(error.message)
+    alert('Reset failed: ' + error.message);
+  } else {
+    alert('Password reset email sent!');
   }
-}
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
@@ -55,15 +69,19 @@ export default function LoginForm() {
         </p>
 
         <p className="text-sm text-center text-gray-400">
-          <a href="#" onClick={() => alert('We’ll add reset password soon')} className="text-blue-400 hover:underline">
-          Forgot your password?
-          </a>
+          <button
+            onClick={handleForgotPassword}
+            type="button"
+            className="text-blue-400 hover:underline"
+          >
+            Forgot your password?
+          </button>
         </p>
 
         {error && <p className="text-red-400 text-sm text-center">❌ {error}</p>}
 
         <p className="text-xs text-center text-gray-500 mt-4">
-              <a href="/privacy" className="hover:underline">Privacy Policy</a> • <a href="/terms" className="hover:underline">Terms of Service</a>
+          <a href="/privacy" className="hover:underline">Privacy Policy</a> • <a href="/terms" className="hover:underline">Terms of Service</a>
         </p>
       </form>
     </div>
