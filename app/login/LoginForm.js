@@ -29,7 +29,12 @@ export default function LoginForm() {
     if (error) {
       setError(error.message)
       setLoading(false)
-      return
+    } else {
+      // Wait a short moment for Supabase session to persist
+      setTimeout(() => {
+        router.refresh() // Make sure middleware sees the session
+        router.push(from)
+      }, 250)
     }
 
     console.log("Login triggered", data)
@@ -69,8 +74,26 @@ export default function LoginForm() {
       <form onSubmit={handleLogin} className="w-full max-w-sm p-6 border border-gray-700 rounded bg-zinc-900 shadow space-y-4">
         <h1 className="text-2xl font-bold text-center">Log In</h1>
 
-        <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded"
+        />
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded"
+        />
 
         <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded">
           Log In
