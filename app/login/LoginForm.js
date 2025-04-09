@@ -26,15 +26,20 @@ export default function LoginForm() {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-    const {
-      data: { session }
-    } = await supabase.auth.getSession()
-
     if (error) {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push(from)
+      const {
+        data: { session }
+      } = await supabase.auth.getSession()
+
+      if (session) {
+        router.push(from)
+      } else {
+        setError("Login failed: session not found")
+        setLoading(false)
+      }
     }
 
     console.log('Login triggered')
