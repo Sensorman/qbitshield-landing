@@ -19,20 +19,31 @@ export default function LoginForm() {
     }
   }, [router.isReady])
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+ const handleLogin = async (e) => {
+  e.preventDefault()
+  setError(null)
+  setLoading(true)
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-  setError(error.message)
-  setLoading(false)
-} else {
-  console.log("✅ Login succeeded, redirecting to:", from)
-  router.push(from)
+  if (error) {
+    setError(error.message)
+    setLoading(false)
+    return
+  }
+
+  console.log("✅ Login succeeded. Waiting for session persistence...")
+
+  // Delay to allow Supabase to persist session before redirect
+  setTimeout(() => {
+    console.log("➡️ Redirecting to:", from)
+    router.refresh()           // force re-check in middleware
+    router.push(from)          // will trigger middleware auth check
+  }, 400)
 }
+
+
+
 
     console.log("Login triggered", data)
 
