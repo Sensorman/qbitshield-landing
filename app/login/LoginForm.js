@@ -1,15 +1,23 @@
 'use client'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { FcGoogle } from "react-icons/fc"
 
 export default function LoginForm() {
   const router = useRouter()
+  const [from, setFrom] = useState('/dashboard')
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (router.isReady) {
+      const url = new URLSearchParams(window.location.search)
+      setFrom(url.get('from') || '/dashboard')
+    }
+  }, [router.isReady])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -25,12 +33,8 @@ export default function LoginForm() {
     if (error) {
       setError(error.message)
       setLoading(false)
-    } else if (session) {
-      const redirectTo = new URLSearchParams(window.location.search).get('from') || '/dashboard'
-      router.push(redirectTo)
     } else {
-      setError('Login succeeded but session is missing.')
-      setLoading(false)
+      router.push(from)
     }
 
     console.log('Login triggered')
