@@ -23,12 +23,15 @@ export default function DashboardPage() {
         data: { session },
       } = await supabase.auth.getSession();
 
+      console.log("✅ Dashboard session check:", session);
+
       if (!session?.user) {
-        router.push("/login");
-      } else {
-        setUser(session.user);
-        fetchUsage();
+        router.replace("/login");
+        return;
       }
+
+      setUser(session.user);
+      await fetchUsage();
     };
 
     const fetchUsage = async () => {
@@ -46,7 +49,7 @@ export default function DashboardPage() {
     };
 
     init();
-  }, [router]);
+  }, []);
 
   if (!user || !usage) {
     return (
