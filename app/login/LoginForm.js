@@ -24,27 +24,20 @@ export default function LoginForm() {
     setError(null)
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setError(error.message)
       setLoading(false)
-    } else {
-      const {
-        data: { session }
-      } = await supabase.auth.getSession()
-
-      if (session) {
-        router.push(from)
-      } else {
-        setError("Login failed: session not found")
-        setLoading(false)
-      }
+      return
     }
 
-    console.log('Login triggered')
-    console.log({ session })
-    console.log({ error })
+    console.log("Login triggered", data)
+
+    // Let Supabase session sync before redirect
+    setTimeout(() => {
+      router.push(from)
+    }, 500)
   }
 
   const handleGoogleLogin = async () => {
