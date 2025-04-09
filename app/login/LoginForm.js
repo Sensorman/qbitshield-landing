@@ -10,12 +10,39 @@ export default function LoginForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
 
+
+
   const handleLogin = async (e) => {
-    e.preventDefault()
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setError(error.message)
-    else router.push("/dashboard")
+  e.preventDefault()
+  setError(null)
+  setLoading(true)
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+  if (error) {
+    setError(error.message)
+    setLoading(false)
+  } else {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession()
+
+    if (session) {
+      const redirectTo = new URLSearchParams(window.location.search).get('from') || '/dashboard'
+      router.push(redirectTo)
+    } else {
+      setError('Login succeeded but session is missing.')
+      setLoading(false)
+    }
   }
+
+    console.log('Login triggered')
+    console.log({ session })
+    console.log({ error })
+}
+
+
+
 
   const handleGoogleLogin = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
