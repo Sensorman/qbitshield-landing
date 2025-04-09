@@ -9,67 +9,59 @@ export default function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
-
-
+  const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e) => {
-  e.preventDefault()
-  setError(null)
-  setLoading(true)
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-  if (error) {
-    setError(error.message)
-    setLoading(false)
-  } else {
     const {
       data: { session }
     } = await supabase.auth.getSession()
 
-    if (session) {
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else if (session) {
       const redirectTo = new URLSearchParams(window.location.search).get('from') || '/dashboard'
       router.push(redirectTo)
     } else {
       setError('Login succeeded but session is missing.')
       setLoading(false)
     }
-  }
 
     console.log('Login triggered')
     console.log({ session })
     console.log({ error })
-}
-
-
-
+  }
 
   const handleGoogleLogin = async () => {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: 'https://qbitshield.com/auth/callback', // This must match Google console
-    },
-  });
-  if (error) console.error("Google login failed:", error.message);
-};
-
-
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://qbitshield.com/auth/callback', // This must match Google console
+      },
+    });
+    if (error) console.error("Google login failed:", error.message);
+  };
 
   const handleForgotPassword = async () => {
-  const email = prompt("Enter your email to reset password");
-  if (!email) return;
+    const email = prompt("Enter your email to reset password");
+    if (!email) return;
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://qbitshield.com/reset-password',
-  });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://qbitshield.com/reset-password',
+    });
 
-  if (error) {
-    alert('Reset failed: ' + error.message);
-  } else {
-    alert('Password reset email sent!');
-  }
-};
+    if (error) {
+      alert('Reset failed: ' + error.message);
+    } else {
+      alert('Password reset email sent!');
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
