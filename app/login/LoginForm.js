@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase"
 import { FcGoogle } from "react-icons/fc"
 
 export default function LoginForm() {
@@ -19,89 +19,56 @@ export default function LoginForm() {
     }
   }, [router.isReady])
 
- const handleLogin = async (e) => {
-  e.preventDefault()
-  setError(null)
-  setLoading(true)
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
-  if (error) {
-    setError(error.message)
-    setLoading(false)
-    return
-  }
-
-  console.log("✅ Login succeeded. Waiting for session persistence...")
-
-  // Delay to allow Supabase to persist session before redirect
-  setTimeout(() => {
-    console.log("➡️ Redirecting to:", from)
-    router.refresh()           // force re-check in middleware
-    router.push(from)          // will trigger middleware auth check
-  }, 400)
-}
-
-
-
-
-    console.log("Login triggered", data)
-
-    // Let Supabase session sync before redirect
-    router.refresh()
-    router.push(from)
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else {
+      setTimeout(() => {
+        router.refresh()
+        router.push(from)
+      }, 250)
+    }
   }
 
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://qbitshield.com/auth/callback', // This must match Google console
+        redirectTo: 'https://qbitshield.com/auth/callback',
       },
-    });
-    if (error) console.error("Google login failed:", error.message);
-  };
+    })
+    if (error) console.error("Google login failed:", error.message)
+  }
 
   const handleForgotPassword = async () => {
-    const email = prompt("Enter your email to reset password");
-    if (!email) return;
+    const email = prompt("Enter your email to reset password")
+    if (!email) return
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: 'https://qbitshield.com/reset-password',
-    });
+    })
 
     if (error) {
-      alert('Reset failed: ' + error.message);
+      alert('Reset failed: ' + error.message)
     } else {
-      alert('Password reset email sent!');
+      alert('Password reset email sent!')
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
       <form onSubmit={handleLogin} className="w-full max-w-sm p-6 border border-gray-700 rounded bg-zinc-900 shadow space-y-4">
         <h1 className="text-2xl font-bold text-center">Log In</h1>
 
-        <input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded"
-        />
-        <input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded"
-        />
+        <input type="email" id="email" name="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
+        <input type="password" id="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
 
         <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded">
           Log In
