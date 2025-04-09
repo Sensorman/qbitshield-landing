@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase";
 import { FcGoogle } from "react-icons/fc"
 
 export default function LoginForm() {
@@ -35,9 +35,8 @@ export default function LoginForm() {
     console.log("Login triggered", data)
 
     // Let Supabase session sync before redirect
-    setTimeout(() => {
-      router.push(from)
-    }, 500)
+    router.refresh()
+    router.push(from)
   }
 
   const handleGoogleLogin = async () => {
