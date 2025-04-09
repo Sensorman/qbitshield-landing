@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -8,21 +8,20 @@ export default function ResetPasswordPage() {
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        const { error } = await supabase.auth.updateUser({
-          password: newPassword,
-        });
-        if (!error) {
-          setSubmitted(true);
-          setTimeout(() => router.push('/login'), 3000);
-        } else {
-          alert('Error resetting password: ' + error.message);
-        }
-      }
-    });
-  }, [newPassword, router]);
+  const handleSubmit = async () => {
+    if (newPassword.length < 6) {
+      alert('Password should be at least 6 characters.');
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      alert('Error resetting password: ' + error.message);
+    } else {
+      setSubmitted(true);
+      setTimeout(() => router.push('/login'), 3000);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-center items-center p-6">
@@ -35,7 +34,7 @@ export default function ResetPasswordPage() {
         onChange={(e) => setNewPassword(e.target.value)}
       />
       <button
-        onClick={() => setSubmitted(true)}
+        onClick={handleSubmit}
         className="mt-4 bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
       >
         Submit
