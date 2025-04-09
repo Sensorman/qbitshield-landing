@@ -19,15 +19,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const init = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
 
       console.log("✅ Dashboard session check:", session);
 
       if (!session?.user) {
-        router.replace("/login");
-        return;
+        console.log("❌ No session found, redirecting to login");
+        return router.replace("/login");
       }
 
       setUser(session.user);
