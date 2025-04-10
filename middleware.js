@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createMiddlewareClient } from '@supabase/auth-helpers/nextjs'
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs/edge'
 // @ts-ignore - Not using explicit typing for req object
 
 export async function middleware(req) {
