@@ -1,13 +1,15 @@
-// middleware.js
 import { NextResponse } from 'next/server'
 import { createMiddlewareClient } from '@supabase/auth-helpers/nextjs'
-import { NextRequest } from 'next/server'
+import { type NextRequest } from 'next/server'
 
 export async function middleware(req) {
   const res = NextResponse.next()
+
   const supabase = createMiddlewareClient({ req, res })
 
-  const { data: { session }, error } = await supabase.auth.getSession()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
   const isProtected = req.nextUrl.pathname.startsWith('/dashboard')
 
@@ -22,5 +24,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'], // only run middleware for protected routes
+  matcher: ['/dashboard/:path*'],
 }
