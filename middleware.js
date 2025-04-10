@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs/edge'
-// @ts-ignore - Not using explicit typing for req object
+import { createMiddlewareClient } from '@supabase/ssr'
 
 export async function middleware(req) {
   const res = NextResponse.next()
-
   const supabase = createMiddlewareClient({ req, res })
 
   const {
