@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createMiddlewareClient } from '@supabase/auth-helpers/nextjs'
-import { type NextRequest } from 'next/server'
+// @ts-ignore - Not using explicit typing for req object
 
 export async function middleware(req) {
   const res = NextResponse.next()
