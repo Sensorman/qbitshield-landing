@@ -11,6 +11,7 @@ import LogoutButton from "@/components/LogoutButton"
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [usage, setUsage] = useState(null);
+  const [checkingSession, setCheckingSession] = useState(true);
   const router = useRouter();
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -25,11 +26,13 @@ export default function DashboardPage() {
 
       if (!session?.user) {
         console.log("❌ No session found, redirecting to login");
-        return router.replace("/login");
+        router.replace("/login");
+      } else {
+        setUser(session.user);
+        await fetchUsage();
       }
 
-      setUser(session.user);
-      await fetchUsage();
+      setCheckingSession(false);
     };
 
     const fetchUsage = async () => {
@@ -49,7 +52,7 @@ export default function DashboardPage() {
     init();
   }, []);
 
-  if (!user || !usage) {
+  if (checkingSession || !user || !usage) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <p className="text-gray-400">🔐 Logging in and loading dashboard...</p>
