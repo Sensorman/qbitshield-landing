@@ -25,6 +25,7 @@ export default function DashboardPage() {
 
     if (!session?.user) {
       console.log("❌ No session found, redirecting to login")
+      setCheckingSession(false);
       return router.replace("/login")
     }
 
@@ -42,8 +43,10 @@ export default function DashboardPage() {
       const data = await res.json()
       console.log("✅ Usage fetched:", data)
       setUsage(data)
+      setCheckingSession(false);
     } catch (err) {
       console.error("🚨 Failed to load usage:", err)
+      setCheckingSession(false);
     }
   }
 
