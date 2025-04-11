@@ -49,7 +49,7 @@ export default function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://xyyrxmrhukiucdfurpku.supabase.co/auth/v1/callback flowName=GeneralOAuthFlow'
+        redirectTo: 'https://xyyrxmrhukiucdfurpku.supabase.co/auth/v1/callback?flowName=GeneralOAuthFlow'
       }
   })
     if (error) console.error("Google login failed:", error.message)
