@@ -49,7 +49,7 @@ export default function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://qbitshield.com/api/auth/callback'
+        redirectTo: 'https://qbitshield.com/auth/callback'
       }
   })
     if (error) console.error("Google login failed:", error.message)
