@@ -19,38 +19,37 @@ export default function DashboardPage() {
   );
 
   useEffect(() => {
-    const init = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+  const init = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    console.log("✅ Dashboard session check:", session, error)
 
-      console.log("✅ Dashboard session check:", session);
+    if (!session?.user) {
+      console.log("❌ No session found, redirecting to login")
+      return router.replace("/login")
+    }
 
-      if (!session?.user) {
-        console.log("❌ No session found, redirecting to login");
-        router.replace("/login");
-      } else {
-        setUser(session.user);
-        await fetchUsage();
-      }
+    setUser(session.user)
+    await fetchUsage()
+  }
 
-      setCheckingSession(false);
-    };
+  const fetchUsage = async () => {
+    try {
+      const res = await fetch("/api/usage", {
+        headers: {
+          "api-key": "test-api-key",
+        },
+      })
+      const data = await res.json()
+      console.log("✅ Usage fetched:", data)
+      setUsage(data)
+    } catch (err) {
+      console.error("🚨 Failed to load usage:", err)
+    }
+  }
 
-    const fetchUsage = async () => {
-      try {
-        const res = await fetch("/api/usage", {
-          headers: {
-            "api-key": "test-api-key",
-          },
-        });
-        const data = await res.json();
-        setUsage(data);
-      } catch (err) {
-        console.error("Failed to load usage:", err);
-      }
-    };
+  init()
+}, [])
 
-    init();
-  }, []);
 
   if (checkingSession || !user || !usage) {
     return (
