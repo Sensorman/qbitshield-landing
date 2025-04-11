@@ -46,14 +46,13 @@ export default function LoginForm() {
   }
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://xyyrxmrhukiucdfurpku.supabase.co/auth/v1/callbackflowName=GeneralOAuthFlow'
-      }
-  })
-    if (error) console.error("Google login failed:", error.message)
-  }
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    // Leave redirectTo undefined to use Supabase-managed callback URL
+  });
+
+  if (error) console.error("Google login failed:", error.message);
+};
 
   const handleForgotPassword = async () => {
     const email = prompt("Enter your email to reset password")
