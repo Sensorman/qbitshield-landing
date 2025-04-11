@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+// No `type` keyword — you're in a .js file
+
 import { createMiddlewareClient } from '@supabase/ssr'
 
-export async function middleware(req: NextRequest) {
+export async function middleware(req) {
   const res = NextResponse.next()
 
   const supabase = createMiddlewareClient({ req, res })
