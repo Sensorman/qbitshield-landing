@@ -22,7 +22,7 @@ export async function GET(request) {
     }
   )
 
-  // finalize login session
+  // This finalizes the OAuth login
   await supabase.auth.getSession()
 
   return NextResponse.redirect(new URL('/dashboard', request.url))
