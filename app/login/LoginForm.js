@@ -24,17 +24,25 @@ export default function LoginForm() {
     setError(null)
     setLoading(true)
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-      setError(error.message)
+    if (loginError) {
+      setError(loginError.message)
       setLoading(false)
-    } else {
-      setTimeout(() => {
-        router.refresh()
-        router.push(from)
-      }, 250)
+      return
     }
+
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+      setError("Login failed. Please try again.")
+      setLoading(false)
+      return
+    }
+
+    console.log("✅ Login session:", session)
+    router.push(from)
+    router.refresh()
   }
 
   const handleGoogleLogin = async () => {
@@ -68,7 +76,7 @@ export default function LoginForm() {
         <h1 className="text-2xl font-bold text-center">Log In</h1>
 
         <input type="email" id="email" name="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
-        <input type="password" id="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
+        <input type="password" id="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded" />
 
         <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded">
           Log In
