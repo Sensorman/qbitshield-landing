@@ -1,23 +1,23 @@
-// app/api/auth/callback/route.js
-
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function GET(request) {
+  const cookieStore = cookies()
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name) {
-          return cookies().get(name)?.value
+          return cookieStore.get(name)?.value
         },
         set(name, value, options) {
-          cookies().set({ name, value, ...options })
+          cookieStore.set({ name, value, ...options })
         },
         remove(name, options) {
-          cookies().set({ name, value: '', ...options, maxAge: 0 })
+          cookieStore.set({ name, value: '', ...options, maxAge: 0 })
         }
       }
     }
@@ -26,10 +26,7 @@ export async function GET(request) {
   // Finalize login session
   await supabase.auth.getSession()
 
-  // Clear redirectTo cookie
-  cookies().set({ name: 'redirectTo', value: '', maxAge: 0 })
-
-  // ✅ Redirect to dashboard
-  const redirectTo = cookies().get('redirectTo')?.value || '/dashboard'
+  // 👇 Check if redirectTo cookie exists, fallback to dashboard
+  const redirectTo = cookieStore.get('redirectTo')?.value || '/dashboard'
   return NextResponse.redirect(new URL(redirectTo, request.url))
 }
