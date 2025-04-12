@@ -6,6 +6,11 @@ import Image from "next/image"
 import Link from "next/link"
 import LogoutButton from "@/components/LogoutButton"
 
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
+
 export default function DashboardPage() {
   const [user, setUser] = useState(null)
   const [usage, setUsage] = useState(null)
@@ -13,11 +18,6 @@ export default function DashboardPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    )
-
     const init = async () => {
       const {
         data: { session },
@@ -40,9 +40,10 @@ export default function DashboardPage() {
       try {
         const res = await fetch("/api/usage")
         const data = await res.json()
+        console.log("✅ Usage fetched:", data)
         setUsage(data)
       } catch (err) {
-        console.error("Failed to load usage:", err)
+        console.error("🚨 Failed to load usage:", err)
       }
     }
 
