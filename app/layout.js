@@ -26,8 +26,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <meta property="og:title" content="QbitShield" />
-        <meta property="og:description" content="Quantum-Safe Key Infrastructure. The next layer of cybersecurity." />
-        <meta property="og:image" content="https://qbitshield.com/images/qbitshield-og-image.jpg" />
+        <meta
+          property="og:description"
+          content="Quantum-Safe Key Infrastructure. The next layer of cybersecurity."
+        />
+        <meta
+          property="og:image"
+          content="https://qbitshield.com/images/qbitshield-og-image.jpg"
+        />
         <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -35,9 +41,7 @@ export default function RootLayout({ children }) {
         <meta property="og:type" content="website" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SupabaseProvider>
-          {children}
-        </SupabaseProvider>
+        <SupabaseProvider>{children}</SupabaseProvider>
       </body>
     </html>
   );
