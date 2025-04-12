@@ -22,22 +22,26 @@ export async function GET(request) {
   );
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  data: { session },
+} = await supabase.auth.getSession()
 
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+console.log("🧠 Supabase session:", session)
 
-  const { data, error } = await supabase
-    .from('usage') // ✅ correct table name here
-    .select('tier, api_key, usage_count, limit')
-    .eq('user_id', session.user.id)
-    .single();
+if (!session?.user) {
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+}
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+const { data, error } = await supabase
+  .from("usage")
+  .select("*") // for debugging
+  .eq("user_id", session.user.id)
+  .maybeSingle()  // instead of .single()
 
-  return NextResponse.json(data, { status: 200 });
+console.log("📊 Usage row fetched:", data)
+
+if (error) {
+  return NextResponse.json({ error: error.message }, { status: 500 })
+}
+
+return NextResponse.json(data ?? {}, { status: 200 })
 }
