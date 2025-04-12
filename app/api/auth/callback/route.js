@@ -24,10 +24,12 @@ export async function GET(request) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
-  console.log("🔐 Finalizing session:", session)
+  // 🔐 Finalize session properly
+  await supabase.auth.getSession()
+  const { data: { user } } = await supabase.auth.getUser()
+  console.log("🔐 Finalized user:", user)
 
-  if (session?.user) {
+  if (user) {
     return NextResponse.redirect(new URL(returnTo, request.url))
   }
 
