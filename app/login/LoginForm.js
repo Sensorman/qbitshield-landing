@@ -56,6 +56,16 @@ export default function LoginForm() {
     if (error) console.error("Google login failed:", error.message);
   };
 
+  const handleGitHubLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: 'https://qbitshield.com/api/auth/callback?redirect=/dashboard'
+      }
+    });
+    if (error) console.error("GitHub login failed:", error.message);
+  };
+
   const handleForgotPassword = async () => {
     const email = prompt("Enter your email to reset password")
     if (!email) return
@@ -89,6 +99,17 @@ export default function LoginForm() {
           className="flex items-center justify-center w-full px-4 py-2 bg-white text-black font-semibold rounded hover:bg-gray-200"
         >
           <FcGoogle className="mr-2 text-xl" /> Log in with Google
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGitHubLogin}
+          className="flex items-center justify-center w-full px-4 py-2 bg-gray-900 text-white font-semibold rounded hover:bg-gray-800"
+        >
+          <svg className="mr-2 w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 .5C5.65.5.5 5.77.5 12.29c0 5.2 3.44 9.6 8.21 11.17.6.1.82-.27.82-.6 0-.29-.01-1.07-.02-2.1-3.34.73-4.04-1.66-4.04-1.66-.55-1.43-1.35-1.8-1.35-1.8-1.1-.78.08-.77.08-.77 1.22.08 1.87 1.27 1.87 1.27 1.08 1.9 2.83 1.35 3.52 1.03.11-.8.42-1.35.76-1.66-2.66-.3-5.47-1.34-5.47-5.96 0-1.32.46-2.4 1.23-3.25-.12-.3-.53-1.5.12-3.12 0 0 1-.32 3.29 1.23A11.7 11.7 0 0 1 12 6.07c1.02.01 2.04.14 3 .4 2.28-1.55 3.27-1.23 3.27-1.23.66 1.62.24 2.82.12 3.12.77.85 1.22 1.93 1.22 3.25 0 4.63-2.82 5.65-5.5 5.95.43.38.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.28 0 .33.21.71.83.59A11.79 11.79 0 0 0 23.5 12.3C23.5 5.77 18.35.5 12 .5z"/>
+          </svg>
+          Log in with GitHub
         </button>
 
         <p className="text-sm text-center text-gray-400">
