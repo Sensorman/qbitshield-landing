@@ -1,10 +1,11 @@
-// app/api/auth/callback/route.js
-
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function GET(request) {
+  const url = new URL(request.url)
+  const returnTo = url.searchParams.get('redirect') || '/dashboard'
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -23,17 +24,11 @@ export async function GET(request) {
     }
   )
 
-  // ⏳ Wait for login session to be set
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const { data: { session } } = await supabase.auth.getSession()
+  console.log("🔐 Finalizing session:", session)
 
-  // ✅ Debug logging
-  console.log("🔐 Callback session:", session)
-
-  // 🧭 Check session and redirect properly
   if (session?.user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL(returnTo, request.url))
   }
 
   return NextResponse.redirect(new URL('/login?error=session', request.url))
