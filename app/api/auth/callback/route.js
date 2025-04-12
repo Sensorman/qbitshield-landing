@@ -25,11 +25,9 @@ export async function GET(request) {
   )
 
   // 🔐 Finalize session properly
-  await supabase.auth.getSession()
-  const { data: { user } } = await supabase.auth.getUser()
-  console.log("🔐 Finalized user:", user)
+  const { data: { session } } = await supabase.auth.getSession()
 
-  if (user) {
+  if (session?.user) {
     return NextResponse.redirect(new URL(returnTo, request.url))
   }
 

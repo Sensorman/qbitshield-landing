@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr' // Added import for createServerClient
+import { cookies } from 'next/headers'
+
 // @ts-ignore - Using JS, not TS, so no type import
 export async function middleware(req) {
   const res = NextResponse.next()
@@ -10,13 +12,13 @@ export async function middleware(req) {
     {
       cookies: {
         get(name) {
-          return req.cookies.get(name)?.value
+          return cookies().get(name)?.value
         },
         set(name, value, options) {
-          res.cookies.set(name, value, options)
+          cookies().set({ name, value, ...options })
         },
         remove(name, options) {
-          res.cookies.set(name, '', { ...options, maxAge: 0 })
+          cookies().set({ name, value: '', ...options, maxAge: 0 })
         }
       }
     }
