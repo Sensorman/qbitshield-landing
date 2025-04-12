@@ -1,4 +1,5 @@
 // app/api/auth/callback/route.js
+
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
@@ -22,8 +23,9 @@ export async function GET(request) {
     }
   )
 
-  // This finalizes the OAuth login
+  // Finalize login session
   await supabase.auth.getSession()
 
+  // ✅ Redirect to dashboard
   return NextResponse.redirect(new URL('/dashboard', request.url))
 }
