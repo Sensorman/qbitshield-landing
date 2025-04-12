@@ -2,9 +2,8 @@
 
 import { useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
 
-export function SupabaseProvider({ children }) {
+export const SupabaseProvider = ({ children }) => {
   const [supabase] = useState(() =>
     createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -12,9 +11,5 @@ export function SupabaseProvider({ children }) {
     )
   )
 
-  return (
-    <SessionContextProvider supabaseClient={supabase}>
-      {children}
-    </SessionContextProvider>
-  )
+  return <>{children}</>  // We no longer need a context wrapper
 }
