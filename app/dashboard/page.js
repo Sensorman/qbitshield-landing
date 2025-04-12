@@ -1,65 +1,68 @@
-"use client";
-export const dynamic = "force-dynamic";
-
-import { useEffect, useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
+"use client"
+import { useEffect, useState } from "react"
+import { createBrowserClient } from "@supabase/ssr"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import Link from "next/link"
 import LogoutButton from "@/components/LogoutButton"
 
 export default function DashboardPage() {
-  const [user, setUser] = useState(null);
-  const [usage, setUsage] = useState(null);
-  const [checkingSession, setCheckingSession] = useState(true);
-  const router = useRouter();
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const [user, setUser] = useState(null)
+  const [usage, setUsage] = useState(null)
+  const [checkingSession, setCheckingSession] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-  const init = async () => {
-    const { data: { session }, error } = await supabase.auth.getSession()
-    console.log("✅ Dashboard session check:", session, error)
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    )
 
-    if (!session?.user) {
-      console.log("❌ No session found, redirecting to login")
-      setCheckingSession(false);
-      return router.replace("/login")
+    const init = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession()
+
+      console.log("🧠 Dashboard session:", session, error)
+
+      if (!session?.user) {
+        router.replace("/login?error=session")
+      } else {
+        setUser(session.user)
+        await fetchUsage()
+      }
+
+      setCheckingSession(false)
     }
 
-    setUser(session.user)
-    await fetchUsage()
-  }
-
-  const fetchUsage = async () => {
-    try {
-      const res = await fetch("/api/usage", {
-        headers: {
-          "api-key": "test-api-key",
-        },
-      })
-      const data = await res.json()
-      console.log("✅ Usage fetched:", data)
-      setUsage(data)
-      setCheckingSession(false);
-    } catch (err) {
-      console.error("🚨 Failed to load usage:", err)
-      setCheckingSession(false);
+    const fetchUsage = async () => {
+      try {
+        const res = await fetch("/api/usage")
+        const data = await res.json()
+        setUsage(data)
+      } catch (err) {
+        console.error("Failed to load usage:", err)
+      }
     }
-  }
 
-  init()
-}, [])
+    init()
+  }, [])
 
-
-  if (checkingSession || !user || !usage) {
+  if (checkingSession) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <p className="text-gray-400">🔐 Logging in and loading dashboard...</p>
       </div>
-    );
+    )
+  }
+
+  if (!user || !usage) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p className="text-red-500">❌ Something went wrong. Please log in again.</p>
+      </div>
+    )
   }
 
   return (
@@ -100,7 +103,7 @@ export default function DashboardPage() {
           </div>
           <div className="bg-zinc-900 p-6 rounded shadow text-center">
             <p className="text-zinc-400">Remaining</p>
-            <h3 className="text-xl font-bold text-white">{usage.remaining}</h3>
+            <h3 className="text-xl font-bold text-white">{usage.limit - usage.usage_count}</h3>
           </div>
         </div>
 
@@ -115,5 +118,5 @@ key = client.generate_key("your-api-key")`}
         </div>
       </main>
     </div>
-  );
+  )
 }
