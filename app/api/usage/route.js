@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 export async function GET(request) {
   const supabase = createServerClient(
@@ -9,42 +9,35 @@ export async function GET(request) {
     {
       cookies: {
         get(name) {
-          return cookies().get(name)?.value
+          return cookies().get(name)?.value;
         },
         set(name, value, options) {
-          cookies().set({ name, value, ...options })
+          cookies().set({ name, value, ...options });
         },
         remove(name, options) {
-          cookies().set({ name, value: '', ...options, maxAge: 0 })
+          cookies().set({ name, value: '', ...options, maxAge: 0 });
         }
       }
     }
-  )
+  );
 
   const {
     data: { session },
-    error,
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
-  if (error || !session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data, error: queryError } = await supabase
-    .from('usage')
-    .select('*')
+  const { data, error } = await supabase
+    .from('api_usage')
+    .select('tier, api_key, usage_count, limit')
     .eq('user_id', session.user.id)
-    .single()
+    .single();
 
-  if (queryError) {
-    return NextResponse.json({ error: 'Usage not found' }, { status: 404 })
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({
-    tier: data.tier,
-    usage_count: data.usage_count,
-    limit: data.limit,
-    remaining: data.limit - data.usage_count,
-    api_key: data.api_key,
-  })
+  return NextResponse.json(data, { status: 200 });
 }
