@@ -26,6 +26,10 @@ export async function GET(request) {
   // Finalize login session
   await supabase.auth.getSession()
 
+  // Clear redirectTo cookie
+  cookies().set({ name: 'redirectTo', value: '', maxAge: 0 })
+
   // ✅ Redirect to dashboard
-  return NextResponse.redirect(new URL('/dashboard', request.url))
+  const redirectTo = cookies().get('redirectTo')?.value || '/dashboard'
+  return NextResponse.redirect(new URL(redirectTo, request.url))
 }
