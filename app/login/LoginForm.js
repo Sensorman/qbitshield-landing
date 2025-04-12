@@ -41,18 +41,20 @@ export default function LoginForm() {
     }
 
     console.log("✅ Login session:", session)
-    router.push(from)
+    router.push('/dashboard')
     router.refresh()
   }
 
   const handleGoogleLogin = async () => {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    // Leave redirectTo undefined to use Supabase-managed callback URL
-  });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://qbitshield.com/api/auth/callback?redirect=/dashboard'
+      }
+    });
 
-  if (error) console.error("Google login failed:", error.message);
-};
+    if (error) console.error("Google login failed:", error.message);
+  };
 
   const handleForgotPassword = async () => {
     const email = prompt("Enter your email to reset password")
