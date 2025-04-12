@@ -30,7 +30,7 @@ export async function GET(request) {
   }
 
   const { data, error } = await supabase
-    .from('api_usage')
+    .from('usage')
     .select('tier, api_key, usage_count, limit')
     .eq('user_id', session.user.id)
     .single();
