@@ -1,25 +1,24 @@
 // middleware.js
-import { NextResponse } from 'next/server'
-import { createMiddlewareClient } from '@supabase/ssr'
+import { NextResponse } from 'next/server';
+import { createMiddlewareClient } from '@supabase/ssr';
 
 export async function middleware(req) {
-  const res = NextResponse.next()
-
-  const supabase = createMiddlewareClient({ req, res })
+  const res = NextResponse.next();
+  const supabase = createMiddlewareClient({ req, res });
 
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
-  console.log('📡 SESSION FROM MIDDLEWARE:', session)
+  console.log('📡 SESSION FROM MIDDLEWARE:', session);
 
   if (!session?.user) {
-    return NextResponse.redirect(new URL('/login?error=session', req.url))
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  return res
+  return res;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
-}
+  matcher: ['/dashboard'],
+};
