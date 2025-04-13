@@ -1,49 +1,27 @@
-// middleware.js
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
+import { createMiddlewareClient } from '@supabase/ssr';
 
-export async function middleware(req) {
-  const res = NextResponse.next();
+export async function middleware(request) {
+  const response = NextResponse.next();
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name) {
-          const val = req.cookies.get(name)?.value;
-          console.log("🍪 GET COOKIE:", name, val?.slice(0, 20));
-          return val;
-        },
-        set(name, value, options) {
-          console.log("🍪 SET COOKIE:", name);
-          res.cookies.set({ name, value, ...options });
-        },
-        remove(name, options) {
-          console.log("❌ REMOVE COOKIE:", name);
-          res.cookies.set({ name, value: '', ...options, maxAge: 0 });
-        },
-      },
-    }
-  );
+  const supabase = createMiddlewareClient({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    request,
+    response
+  });
 
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  console.log("📡 SESSION:", session);
-  if (error) console.log("⚠️ Supabase getSession error:", error.message);
+  const isProtected = request.nextUrl.pathname.startsWith('/dashboard');
 
-  if (!session?.user) {
-    console.log("🔒 Unauthorized, redirecting to login.");
-    const loginUrl = new URL('/login', req.url);
-    loginUrl.searchParams.set('error', 'session');
-    loginUrl.searchParams.set('from', req.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+  if (isProtected && !session) {
+    const redirectUrl = new URL('/login', request.url);
+    redirectUrl.searchParams.set('from', request.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  console.log("✅ Middleware: User session verified", session.user.email);
-  return res;
+  return response;
 }
-
-export const config = {
-  matcher: ['/dashboard/:path*'],
-};
