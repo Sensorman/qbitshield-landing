@@ -1,4 +1,3 @@
-// middleware.js
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
@@ -18,25 +17,27 @@ export async function middleware(req) {
         },
         remove(name, options) {
           res.cookies.set({ name, value: '', ...options, maxAge: 0 });
-        },
-      },
+        }
+      }
     }
   );
 
   const { data: { session }, error } = await supabase.auth.getSession();
 
-  console.log("🔍 [Middleware] Session:", session);
-  console.log("⚠️ [Middleware] Error:", error);
+  console.log("🧠 [Middleware] Session:", session);
+  console.log("❌ [Middleware] Error:", error);
 
   if (!session?.user) {
-    console.log("🚫 No session, redirecting to login...");
-    return NextResponse.redirect(new URL(`/login?error=session`, req.url));
+    console.log("🚫 [Middleware] No session. Redirecting to login...");
+    const loginUrl = new URL('/login?error=session', req.url);
+    loginUrl.searchParams.set('from', req.nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  console.log("✅ Authenticated:", session.user.email);
+  console.log("✅ [Middleware] Authenticated:", session.user.email);
   return res;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*'], // Protect dashboard and all subroutes
 };
