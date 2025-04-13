@@ -1,39 +1,40 @@
 // middleware.js
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
+import { createMiddlewareClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
-export async function middleware(request) {
-  const response = NextResponse.next()
+export async function middleware(req) {
+  const res = NextResponse.next()
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name) {
-          return request.cookies.get(name)?.value
-        },
-        set(name, value, options) {
-          response.cookies.set({ name, value, ...options })
-        },
-        remove(name, options) {
-          response.cookies.set({ name, value: '', ...options, maxAge: 0 })
-        }
-      }
-    }
-  )
+  const supabase = createMiddlewareClient({
+    req,
+    res,
+    cookies: {
+      get(name) {
+        return cookies().get(name)?.value
+      },
+      set(name, value, options) {
+        cookies().set({ name, value, ...options })
+      },
+      remove(name, options) {
+        cookies().set({ name, value: '', ...options, maxAge: 0 })
+      },
+    },
+  })
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
   console.log('📡 SESSION FROM MIDDLEWARE:', session)
 
-  if (!session?.user) {
-    return NextResponse.redirect(new URL(`/login?error=session`, request.url))
+  if (!session) {
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  return response
+  return res
 }
 
-// Restrict this middleware only to protected routes
 export const config = {
-  matcher: ['/dashboard']
+  matcher: ['/dashboard/:path*'],
 }
