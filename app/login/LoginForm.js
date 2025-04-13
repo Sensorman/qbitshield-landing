@@ -17,13 +17,12 @@ export default function LoginForm() {
     if (router.isReady) {
       const url = new URLSearchParams(window.location.search);
       setFrom(url.get('from') || '/dashboard');
-    }
 
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log("Post-login session:", session);
-    };
-    checkSession();
+      (async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Post-login session:", session);
+      })();
+    }
   }, [router.isReady]);
 
   const handleLogin = async (e) => {
