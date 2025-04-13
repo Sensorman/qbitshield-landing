@@ -20,27 +20,13 @@ export async function GET(request) {
         },
       },
     }
-  )
+  );
 
-  // Finalize the login session
-  await supabase.auth.getSession()
+  // Finalize session
+  await supabase.auth.getSession();
 
-  // Redirect to dashboard or fallback
-  const url = new URL(request.url)
-  const redirect = url.searchParams.get("redirect") || "/dashboard"
-  return NextResponse.redirect(new URL(redirect, request.url))
-}
-
-  const {
-    data: { session },
-    error
-  } = await supabase.auth.getSession()
-
-  if (error) {
-    console.error("❌ Error finalizing session:", error.message)
-  }
-
-  const redirectUrl = new URL(request.url)
-  const target = redirectUrl.searchParams.get("redirect") || "/dashboard"
-  return NextResponse.redirect(new URL(target, request.url))
+  // Safely redirect user after login
+  const redirectUrl = new URL(request.url);
+  const target = redirectUrl.searchParams.get("redirect") || "/dashboard";
+  return NextResponse.redirect(new URL(target, request.url));
 }
