@@ -12,13 +12,21 @@ export async function middleware(req) {
     {
       cookies: {
         get(name) {
-          return req.cookies.get(name)?.value;
+          try {
+            return req.cookies?.get(name)?.value;
+          } catch {
+            return undefined;
+          }
         },
         set(name, value, options) {
-          res.cookies.set(name, value, options);
+          try {
+            res.cookies.set(name, value, options);
+          } catch {}
         },
         remove(name, options) {
-          res.cookies.set(name, '', { ...options, maxAge: 0 });
+          try {
+            res.cookies.set(name, '', { ...options, maxAge: 0 });
+          } catch {}
         }
       }
     }
