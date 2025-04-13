@@ -27,20 +27,16 @@ export async function middleware(request) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // If user is not logged in and trying to access protected route, redirect to login
+  // Redirect to /login if not authenticated
   if (!session?.user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+    const redirectUrl = new URL('/login', request.url);
+    redirectUrl.searchParams.set('from', request.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
   }
 
   return response;
 }
 
-// Restrict middleware to relevant paths
 export const config = {
   matcher: ['/dashboard/:path*'],
 };
-
-console.log('Session:', session);
-console.log('Request URL:', request.url);
