@@ -12,7 +12,7 @@ export async function middleware(req) {
       cookies: {
         get(name) {
           const val = req.cookies.get(name)?.value;
-          console.log("🍪 GET COOKIE:", name, val);
+          console.log("🍪 GET COOKIE:", name, val?.slice(0, 20));
           return val;
         },
         set(name, value, options) {
@@ -30,19 +30,20 @@ export async function middleware(req) {
   const { data: { session }, error } = await supabase.auth.getSession();
 
   console.log("📡 SESSION:", session);
-  console.log("⚠️ ERROR:", error);
+  if (error) console.log("⚠️ Supabase getSession error:", error.message);
 
   if (!session?.user) {
-    console.log("🛑 No session found. Redirecting to login.");
-    const loginUrl = new URL('/login?error=session', req.url);
+    console.log("🔒 Unauthorized, redirecting to login.");
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('error', 'session');
     loginUrl.searchParams.set('from', req.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  console.log("✅ User authenticated:", session.user.email);
+  console.log("✅ Middleware: User session verified", session.user.email);
   return res;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'], // Apply only to /dashboard and subroutes
+  matcher: ['/dashboard/:path*'],
 };
