@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
@@ -23,15 +24,15 @@ export default function DashboardPage() {
         error,
       } = await supabase.auth.getSession();
 
-      console.log('📦 Dashboard session:', session, error);
+      console.log('✅ Dashboard session:', session, error);
 
       if (!session?.user) {
         router.replace('/login?error=session');
-      } else {
-        setUser(session.user);
-        await fetchUsage();
+        return;
       }
 
+      setUser(session.user);
+      await fetchUsage();
       setCheckingSession(false);
     };
 
@@ -39,19 +40,19 @@ export default function DashboardPage() {
       try {
         const res = await fetch('/api/usage');
         const data = await res.json();
-        console.log('📈 Usage fetched:', data);
+        console.log('✅ Usage fetched:', data);
         setUsage(data);
       } catch (err) {
-        console.error('🚨 Failed to load usage:', err);
+        console.error('🚨 Failed to fetch usage:', err);
       }
     };
 
     init();
-  }, [router, supabase.auth]);
+  }, [router]);
 
   if (checkingSession || !user || !usage) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <p className="text-gray-400">🔐 Logging in and loading dashboard...</p>
       </div>
     );
@@ -85,9 +86,7 @@ export default function DashboardPage() {
         <div className="bg-zinc-900 p-6 rounded mb-8 border border-zinc-700">
           <h2 className="text-xl font-semibold mb-2">Your API Key</h2>
           <p className="bg-gray-800 p-2 rounded text-sm font-mono select-all">{usage.api_key}</p>
-          <p className="text-zinc-400 text-sm mt-2">
-            Use this key with the QbitShield SDK to generate quantum keys securely.
-          </p>
+          <p className="text-zinc-400 text-sm mt-2">Use this key with the QbitShield SDK to generate quantum keys securely.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
