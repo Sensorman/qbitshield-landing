@@ -1,79 +1,76 @@
-"use client"
-import { useEffect, useState } from "react"
-import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import LogoutButton from "@/components/LogoutButton"
-
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+"use client";
+import { useEffect, useState } from "react";
+import { createBrowserClient } from "@supabase/ssr";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  const [user, setUser] = useState(null)
-  const [usage, setUsage] = useState(null)
-  const [checkingSession, setCheckingSession] = useState(true)
-  const router = useRouter()
+  const [user, setUser] = useState(null);
+  const [usage, setUsage] = useState(null);
+  const [checkingSession, setCheckingSession] = useState(true);
+  const router = useRouter();
 
-  const fetchUsage = async () => {
-    try {
-      const res = await fetch("/api/usage")
-      const data = await res.json()
-      console.log("✅ Usage fetched:", data)
-      setUsage(data)
-    } catch (err) {
-      console.error("🚨 Failed to load usage:", err)
-    }
-  }
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
 
   useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log("Dashboard session:", session)
-      if (!session?.user) {
-        router.replace("/login?error=session")
-      } else {
-        setUser(session.user)
-        await fetchUsage()
-      }
-      setCheckingSession(false)
-    }
-    init()
-  }, [])
+    const waitForSession = async () => {
+      let tries = 0;
+      let session = null;
 
-  if (checkingSession) {
+      while (!session && tries < 10) {
+        const { data } = await supabase.auth.getSession();
+        session = data?.session;
+        if (!session) {
+          tries++;
+          await new Promise((r) => setTimeout(r, 500)); // Wait 500ms
+        }
+      }
+
+      if (!session) {
+        console.warn("❌ No session found after retries");
+        router.replace("/login?error=session");
+        return;
+      }
+
+      console.log("✅ Authenticated session:", session);
+      setUser(session.user);
+      await fetchUsage(session.user.id);
+      setCheckingSession(false);
+    };
+
+    const fetchUsage = async (userId) => {
+      try {
+        const res = await fetch("/api/usage");
+        const data = await res.json();
+        setUsage(data);
+        console.log("✅ Usage fetched:", data);
+      } catch (err) {
+        console.error("🚨 Usage fetch error:", err);
+      }
+    };
+
+    waitForSession();
+  }, []);
+
+  if (checkingSession || !user || !usage) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <p className="text-gray-400">🔐 Logging in and loading dashboard...</p>
       </div>
-    )
-  }
-
-  if (!user || !usage) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-red-500">❌ Something went wrong. Please log in again.</p>
-      </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
-        <Image
-          src="/Black-QbitShieldVectorLogo.png"
-          alt="QbitShield Logo"
-          width={150}
-          height={50}
-          priority
-        />
+        <img src="/Black-QbitShieldVectorLogo.png" alt="QbitShield Logo" width={150} />
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-sm underline text-gray-300 hover:text-white">
-            Home
-          </Link>
-          <LogoutButton />
+          <a href="/" className="text-sm underline text-gray-300 hover:text-white">Home</a>
+          <form method="POST" action="/api/logout">
+            <button type="submit" className="text-sm text-red-500 hover:text-red-700">Logout</button>
+          </form>
         </div>
       </header>
 
@@ -112,5 +109,5 @@ key = client.generate_key("your-api-key")`}
         </div>
       </main>
     </div>
-  )
+  );
 }
