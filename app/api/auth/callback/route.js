@@ -4,29 +4,41 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function GET(request) {
+  const res = NextResponse.redirect(new URL('/dashboard', request.url))
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name) {
-          return cookies().get(name)?.value
+          try {
+            return cookies().get(name)?.value
+          } catch {
+            return undefined
+          }
         },
         set(name, value, options) {
-          cookies().set({ name, value, ...options })
+          try {
+            res.cookies.set(name, value, options)
+          } catch {}
         },
         remove(name, options) {
-          cookies().set({ name, value: '', ...options, maxAge: 0 })
+          try {
+            res.cookies.set(name, '', { ...options, maxAge: 0 })
+          } catch {}
         },
       },
     }
   );
 
-  // Finalize session
   await supabase.auth.getSession();
 
-  // Safely redirect user after login
   const redirectUrl = new URL(request.url);
-  const target = redirectUrl.searchParams.get("redirect") || "/dashboard";
-  return NextResponse.redirect(new URL(target, request.url));
+  const target = redirectUrl.searchParams.get("redirect");
+  if (target && target.startsWith("/")) {
+    return NextResponse.redirect(new URL(target, request.url));
+  }
+
+  return res;
 }
