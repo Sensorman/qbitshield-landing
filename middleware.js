@@ -25,13 +25,15 @@ export async function middleware(req) {
 
   const { data: { session }, error } = await supabase.auth.getSession();
 
-  console.log("🔒 Middleware session check:", session);
-  console.log("🧩 Supabase session error:", error);
+  console.log("🔍 [Middleware] Session:", session);
+  console.log("⚠️ [Middleware] Error:", error);
 
   if (!session?.user) {
+    console.log("🚫 No session, redirecting to login...");
     return NextResponse.redirect(new URL(`/login?error=session`, req.url));
   }
 
+  console.log("✅ Authenticated:", session.user.email);
   return res;
 }
 

@@ -1,44 +1,32 @@
 // app/api/auth/callback/route.js
-import { cookies } from 'next/headers'
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse } from 'next/server';
 
 export async function GET(request) {
-  const res = NextResponse.redirect(new URL('/dashboard', request.url))
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name) {
-          try {
-            return cookies().get(name)?.value
-          } catch {
-            return undefined
-          }
+          return cookies().get(name)?.value;
         },
         set(name, value, options) {
-          try {
-            res.cookies.set(name, value, options)
-          } catch {}
+          cookies().set({ name, value, ...options });
         },
         remove(name, options) {
-          try {
-            res.cookies.set(name, '', { ...options, maxAge: 0 })
-          } catch {}
+          cookies().set({ name, value: '', ...options, maxAge: 0 });
         },
       },
     }
   );
 
-  await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getSession();
+  console.log("📦 [Callback] Session Finalized:", data, error);
 
   const redirectUrl = new URL(request.url);
-  const target = redirectUrl.searchParams.get("redirect");
-  if (target && target.startsWith("/")) {
-    return NextResponse.redirect(new URL(target, request.url));
-  }
+  const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard';
 
-  return res;
+  return NextResponse.redirect(new URL(redirectTo, request.url));
 }
