@@ -17,30 +17,29 @@ export default function DashboardPage() {
   const [checkingSession, setCheckingSession] = useState(true)
   const router = useRouter()
 
+  const fetchUsage = async () => {
+    try {
+      const res = await fetch("/api/usage")
+      const data = await res.json()
+      console.log("✅ Usage fetched:", data)
+      setUsage(data)
+    } catch (err) {
+      console.error("🚨 Failed to load usage:", err)
+    }
+  }
+
   useEffect(() => {
-  const init = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
-      router.replace("/login?error=session");
-    } else {
-      setUser(session.user);
-      await fetchUsage();
-    }
-  };
-  init();
-}, []);
-
-    const fetchUsage = async () => {
-      try {
-        const res = await fetch("/api/usage")
-        const data = await res.json()
-        console.log("✅ Usage fetched:", data)
-        setUsage(data)
-      } catch (err) {
-        console.error("🚨 Failed to load usage:", err)
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log("Dashboard session:", session)
+      if (!session?.user) {
+        router.replace("/login?error=session")
+      } else {
+        setUser(session.user)
+        await fetchUsage()
       }
+      setCheckingSession(false)
     }
-
     init()
   }, [])
 
