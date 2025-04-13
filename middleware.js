@@ -1,6 +1,6 @@
 // middleware.js
 import { createServerClient } from '@supabase/ssr';
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export async function middleware(req) {
   const res = NextResponse.next();
@@ -23,7 +23,15 @@ export async function middleware(req) {
     }
   );
 
-  await supabase.auth.getSession();
+  const { data: { session }, error } = await supabase.auth.getSession();
+
+  console.log("🔒 Middleware session check:", session);
+  console.log("🧩 Supabase session error:", error);
+
+  if (!session?.user) {
+    return NextResponse.redirect(new URL(`/login?error=session`, req.url));
+  }
+
   return res;
 }
 
