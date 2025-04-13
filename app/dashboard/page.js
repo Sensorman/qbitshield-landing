@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // Make sure this is at the top
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -67,7 +68,7 @@ export default function DashboardPage() {
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
         <img src="/Black-QbitShieldVectorLogo.png" alt="QbitShield Logo" width={150} />
         <div className="flex items-center gap-4">
-          <a href="/" className="text-sm underline text-gray-300 hover:text-white">Home</a>
+          <Link href="/" className="text-sm underline text-gray-300 hover:text-white">Home</Link>
           <form method="POST" action="/api/logout">
             <button type="submit" className="text-sm text-red-500 hover:text-red-700">Logout</button>
           </form>
