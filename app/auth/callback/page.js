@@ -9,9 +9,19 @@ export default function CallbackPage() {
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession()
-      if (data?.session) router.push("/dashboard")
-      else router.push("/login?error=session")
+
+      console.log("🔍 Supabase session:", data?.session)
+      console.log("⚠️ Supabase error (if any):", error)
+
+      if (data?.session) {
+        console.log("✅ Session found, redirecting to /dashboard")
+        router.push("/dashboard")
+      } else {
+        console.warn("🚫 No session found, redirecting to /login")
+        router.push("/login?error=session")
+      }
     }
+
     checkSession()
   }, [])
 

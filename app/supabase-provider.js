@@ -1,7 +1,9 @@
+// app/supabase-provider.js
 'use client'
-
-import { useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { createContext, useContext, useState, useEffect } from 'react'
+
+const SupabaseContext = createContext()
 
 export const SupabaseProvider = ({ children }) => {
   const [supabase] = useState(() =>
@@ -11,5 +13,11 @@ export const SupabaseProvider = ({ children }) => {
     )
   )
 
-  return <>{children}</>  // We no longer need a context wrapper
+  return (
+    <SupabaseContext.Provider value={{ supabase }}>
+      {children}
+    </SupabaseContext.Provider>
+  )
 }
+
+export const useSupabase = () => useContext(SupabaseContext)
