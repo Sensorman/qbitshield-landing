@@ -1,4 +1,3 @@
-// /app/api/auth/callback/route.js
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -22,10 +21,10 @@ export async function GET(request) {
     }
   );
 
-  // 👇 This finalizes the session by reading the code from URL and setting the cookie
+  // ⬇ Finalizes session based on access token
   await supabase.auth.getSession();
 
   const redirectUrl = new URL(request.url);
-  const target = redirectUrl.searchParams.get('redirect') || '/dashboard';
-  return NextResponse.redirect(new URL(target, request.url));
+  const redirectPath = redirectUrl.searchParams.get('redirect') || '/dashboard';
+  return NextResponse.redirect(new URL(redirectPath, request.url));
 }
