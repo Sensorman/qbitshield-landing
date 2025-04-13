@@ -18,23 +18,37 @@ export default function DashboardPage() {
   );
 
   useEffect(() => {
-    const init = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+  const init = async () => {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
-      console.log('✅ Dashboard session:', session, error);
+    console.log('✅ Dashboard session:', session, error);
 
-      if (!session?.user) {
-        router.replace('/login?error=session');
-        return;
-      }
+    if (!session?.user) {
+      router.replace('/login?error=session');
+      return;
+    }
 
-      setUser(session.user);
-      await fetchUsage();
-      setCheckingSession(false);
-    };
+    setUser(session.user);
+    await fetchUsage();
+    setCheckingSession(false);
+  };
+
+  const fetchUsage = async () => {
+    try {
+      const res = await fetch('/api/usage');
+      const data = await res.json();
+      console.log('✅ Usage fetched:', data);
+      setUsage(data);
+    } catch (err) {
+      console.error('🚨 Failed to fetch usage:', err);
+    }
+  };
+
+  init();
+}, [router]);
 
     const fetchUsage = async () => {
       try {
