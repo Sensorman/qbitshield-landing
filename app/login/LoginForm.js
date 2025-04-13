@@ -76,6 +76,10 @@ export default function LoginForm() {
     if (error) console.error("LinkedIn login failed:", error.message);
   };
 
+  const { data: { session } } = await supabase.auth.getSession();
+  console.log("Post-login session:", session);
+
+
   const handleForgotPassword = async () => {
     const email = prompt("Enter your email to reset password")
     if (!email) return
