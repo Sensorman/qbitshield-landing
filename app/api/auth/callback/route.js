@@ -20,13 +20,18 @@ export async function GET(request) {
         },
       },
     }
-  );
+  )
 
-  // Finalize session
-  await supabase.auth.getSession();
+  const {
+    data: { session },
+    error
+  } = await supabase.auth.getSession()
 
-  // Redirect to dashboard
-  const redirectUrl = new URL(request.url);
-  const target = redirectUrl.searchParams.get("redirect") || "/dashboard";
-  return NextResponse.redirect(new URL(target, request.url));
+  if (error) {
+    console.error("❌ Error finalizing session:", error.message)
+  }
+
+  const redirectUrl = new URL(request.url)
+  const target = redirectUrl.searchParams.get("redirect") || "/dashboard"
+  return NextResponse.redirect(new URL(target, request.url))
 }
