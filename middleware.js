@@ -1,30 +1,39 @@
 // middleware.js
-import { createMiddlewareClient } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
-export async function middleware(req) {
-  const res = NextResponse.next()
+export async function middleware(request) {
+  const response = NextResponse.next()
 
-  const supabase = createMiddlewareClient({
-    req,
-    res,
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value
+        },
+        set(name, value, options) {
+          response.cookies.set({ name, value, ...options })
+        },
+        remove(name, options) {
+          response.cookies.set({ name, value: '', ...options, maxAge: 0 })
+        }
+      }
+    }
+  )
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
+  const { data: { session } } = await supabase.auth.getSession()
   console.log('📡 SESSION FROM MIDDLEWARE:', session)
 
   if (!session?.user) {
-    return NextResponse.redirect(new URL('/login?error=session', req.url))
+    return NextResponse.redirect(new URL(`/login?error=session`, request.url))
   }
 
-  return res
+  return response
 }
 
+// Restrict this middleware only to protected routes
 export const config = {
-  matcher: ['/dashboard'],
+  matcher: ['/dashboard']
 }
