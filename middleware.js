@@ -1,9 +1,9 @@
 // middleware.js
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
-export async function middleware(request) {
-  const response = NextResponse.next();
+export async function middleware(req) {
+  const res = NextResponse.next();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -11,13 +11,13 @@ export async function middleware(request) {
     {
       cookies: {
         get(name) {
-          return request.cookies.get(name)?.value;
+          return req.cookies.get(name)?.value;
         },
         set(name, value, options) {
-          response.cookies.set({ name, value, ...options });
+          res.cookies.set({ name, value, ...options });
         },
         remove(name, options) {
-          response.cookies.set({ name, value: '', ...options, maxAge: 0 });
+          res.cookies.set({ name, value: '', ...options, maxAge: 0 });
         },
       },
     }
@@ -27,22 +27,20 @@ export async function middleware(request) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  const {
-  data: { session },
-} = await supabase.auth.getSession();
+  console.log('📡 SESSION FROM MIDDLEWARE:', session);
 
-console.log('📡 SESSION FROM MIDDLEWARE:', session);
-
-  // Redirect to /login if not authenticated
-  if (!session?.user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    const redirectUrl = new URL('/login', request.url);
-    redirectUrl.searchParams.set('from', request.nextUrl.pathname);
+  // Protect /dashboard route
+  if (req.nextUrl.pathname.startsWith('/dashboard') && !session?.user) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = '/login';
+    redirectUrl.searchParams.set('error', 'session');
+    redirectUrl.searchParams.set('from', req.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  return response;
+  return res;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard'],
 };
