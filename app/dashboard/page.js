@@ -18,23 +18,17 @@ export default function DashboardPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const init = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser()
-
-      console.log("🧠 Dashboard user:", user, error)
-
-      if (!user) {
-        router.replace("/login?error=session")
-      } else {
-        setUser(user)
-        await fetchUsage()
-      }
-
-      setCheckingSession(false)
+  const init = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.user) {
+      router.replace("/login?error=session");
+    } else {
+      setUser(session.user);
+      await fetchUsage();
     }
+  };
+  init();
+}, []);
 
     const fetchUsage = async () => {
       try {
