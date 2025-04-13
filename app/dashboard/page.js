@@ -24,6 +24,10 @@ export default function DashboardPage() {
         error,
       } = await supabase.auth.getSession()
 
+      if (!session) {
+        console.warn("⚠️ No session returned from getSession - possible cookie issue.")
+      }
+
       console.log("🧠 Dashboard session:", session, error)
 
       if (!session?.user) {
