@@ -48,12 +48,28 @@ export default function DashboardPage() {
     };
 
     init();
-  }, [router]);
+  }, [router, supabase.auth]);
 
-  if (checkingSession || !user || !usage) {
+  if (checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <p className="text-gray-400">🔐 Logging in and loading dashboard...</p>
+        <p className="text-gray-400">🔄 Checking session...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <p className="text-red-400">❌ No user session found. Redirecting to login...</p>
+      </div>
+    );
+  }
+
+  if (!usage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <p className="text-yellow-400">⚠️ Unable to fetch usage data.</p>
       </div>
     );
   }
