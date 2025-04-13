@@ -27,6 +27,12 @@ export async function middleware(request) {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+console.log('📡 SESSION FROM MIDDLEWARE:', session);
+
   // Redirect to /login if not authenticated
   if (!session?.user && request.nextUrl.pathname.startsWith('/dashboard')) {
     const redirectUrl = new URL('/login', request.url);
