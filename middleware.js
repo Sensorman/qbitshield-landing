@@ -9,7 +9,7 @@ export async function middleware(req) {
     req,
     res,
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   })
 
   await supabase.auth.getSession()
@@ -18,5 +18,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*']
+  matcher: ['/dashboard/:path*'],
 }
