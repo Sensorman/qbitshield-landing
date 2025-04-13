@@ -1,6 +1,6 @@
 // middleware.js
 import { createServerClient } from '@supabase/ssr';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 
 export async function middleware(req) {
   const res = NextResponse.next();
@@ -11,39 +11,19 @@ export async function middleware(req) {
     {
       cookies: {
         get(name) {
-          try {
-            return req.cookies?.get(name)?.value;
-          } catch {
-            return undefined;
-          }
+          return req.cookies.get(name)?.value;
         },
         set(name, value, options) {
-          try {
-            res.cookies.set(name, value, options);
-          } catch {}
+          res.cookies.set({ name, value, ...options });
         },
         remove(name, options) {
-          try {
-            res.cookies.set(name, '', { ...options, maxAge: 0 });
-          } catch {}
-        }
-      }
+          res.cookies.set({ name, value: '', ...options, maxAge: 0 });
+        },
+      },
     }
   );
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const isProtected = req.nextUrl.pathname.startsWith('/dashboard');
-
-  if (isProtected && !session) {
-    const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    redirectUrl.searchParams.set('from', req.nextUrl.pathname);
-    return NextResponse.redirect(redirectUrl);
-  }
-
+  await supabase.auth.getSession();
   return res;
 }
 
