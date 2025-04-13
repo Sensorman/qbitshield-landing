@@ -17,7 +17,7 @@ export default function DashboardPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
 
-    useEffect(() => {
+  useEffect(() => {
     const init = async () => {
       const {
         data: { session },
@@ -35,10 +35,6 @@ export default function DashboardPage() {
       await fetchUsage();
       setCheckingSession(false);
     };
-
-    init();
-
-  }, [router, supabase.auth]);
 
     const fetchUsage = async () => {
       try {
@@ -106,7 +102,9 @@ export default function DashboardPage() {
         <div className="bg-zinc-900 p-6 rounded mb-8 border border-zinc-700">
           <h2 className="text-xl font-semibold mb-2">Your API Key</h2>
           <p className="bg-gray-800 p-2 rounded text-sm font-mono select-all">{usage.api_key}</p>
-          <p className="text-zinc-400 text-sm mt-2">Use this key with the QbitShield SDK to generate quantum keys securely.</p>
+          <p className="text-zinc-400 text-sm mt-2">
+            Use this key with the QbitShield SDK to generate quantum keys securely.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
