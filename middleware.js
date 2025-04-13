@@ -1,11 +1,11 @@
 // middleware.js
+import { createMiddlewareClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 
 export async function middleware(req) {
   const res = NextResponse.next()
 
-  // Attach Supabase session to the request manually using auth-helpers-nextjs
+  // Use Supabase helper to attach auth context to request and response
   const supabase = createMiddlewareClient({ req, res })
 
   const {
@@ -14,10 +14,8 @@ export async function middleware(req) {
 
   console.log('📡 SESSION FROM MIDDLEWARE:', session)
 
-  // Not logged in? redirect to login page
-  if (!session) {
-    const redirectUrl = req.nextUrl.clone()
-    redirectUrl.pathname = '/login'
+  if (!session?.user && req.nextUrl.pathname.startsWith('/dashboard')) {
+    const redirectUrl = new URL('/login', req.url)
     redirectUrl.searchParams.set('from', req.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
   }
@@ -25,7 +23,7 @@ export async function middleware(req) {
   return res
 }
 
-// Protect dashboard route
+// Add matcher to run middleware only on protected routes
 export const config = {
   matcher: ['/dashboard/:path*'],
 }
