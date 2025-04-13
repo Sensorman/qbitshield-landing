@@ -1,13 +1,16 @@
 // middleware.js
-import { NextResponse } from 'next/server'
 import { createMiddlewareClient } from '@supabase/ssr'
+import { NextResponse } from 'next/server'
 
-/** @type {import('next/server').NextFetchEvent} */
 export async function middleware(req) {
   const res = NextResponse.next()
 
-  // create Supabase client for middleware
-  const supabase = createMiddlewareClient({ req, res })
+  const supabase = createMiddlewareClient({
+    req,
+    res,
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  })
 
   const {
     data: { session },
@@ -15,10 +18,8 @@ export async function middleware(req) {
 
   console.log('📡 SESSION FROM MIDDLEWARE:', session)
 
-  if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
-    const loginUrl = new URL('/login', req.url)
-    loginUrl.searchParams.set('from', req.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
+  if (!session?.user) {
+    return NextResponse.redirect(new URL('/login?error=session', req.url))
   }
 
   return res
