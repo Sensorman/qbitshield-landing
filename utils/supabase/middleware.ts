@@ -1,11 +1,10 @@
-'use server'
-
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest): Promise<any> {
-  const cookieStore = cookies() // ← ❗️Remove `await` — it's not async
+  const cookieStore = cookies(); // ✅ no await
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
