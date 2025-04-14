@@ -1,32 +1,24 @@
-// utils/supabase/middleware.ts
-'use server'
-
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { cookies } from 'next/headers'
 
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request })
+export async function createClient() {
+  const cookieStore = await cookies(); // ✅ properly await the Promise
 
-  const supabase = createServerClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
+        get(name: string) {
+          return cookieStore.get(name)?.value;
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
+        set(name, value, options) {
+          cookieStore.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          cookieStore.set({ name, value: '', ...options });
         },
       },
     }
-  )
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  return response
+  );
 }
