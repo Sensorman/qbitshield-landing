@@ -1,10 +1,11 @@
-// utils/supabase/middleware.ts
+'use server'
+
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 
-export async function updateSession(request: NextRequest) {
-  const cookieStore = cookies(); // ❌ DO NOT AWAIT
+export async function updateSession(request: NextRequest): Promise<any> {
+  const cookieStore = await cookies(); // Note: cookies() is now async in Next.js 15+
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,11 +23,11 @@ export async function updateSession(request: NextRequest) {
         }
       }
     }
-  );
+  )
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { user }
+  } = await supabase.auth.getUser()
 
-  return user;
+  return user
 }
