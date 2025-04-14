@@ -1,27 +1,31 @@
 // middleware.js
-import { createMiddlewareClient } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
-export async function middleware(request) {
-  const response = NextResponse.next()
+export async function middleware(req) {
+  const res = NextResponse.next()
 
-  const supabase = createMiddlewareClient({
-    cookies: () => cookies(), // Correctly inject the cookie getter
-  })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get: (name) => req.cookies.get(name)?.value,
+        set: (name, value, options) => res.cookies.set({ name, value, ...options }),
+        remove: (name, options) => res.cookies.set({ name, value: '', ...options, maxAge: 0 }),
+      }
+    }
+  )
 
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession()
+  const { data: { session } } = await supabase.auth.getSession()
 
-  console.log('📡 Middleware session:', session, error)
+  console.log('📡 SESSION FROM MIDDLEWARE:', session)
 
-  if (!session?.user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  if (!session?.user && req.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  return response
+  return res
 }
 
 export const config = {
