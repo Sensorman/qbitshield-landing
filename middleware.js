@@ -1,10 +1,28 @@
 // middleware.js
-import { createMiddlewareClient } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function middleware(req) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return cookies().get(name)?.value
+        },
+        set(name, value, options) {
+          cookies().set({ name, value, ...options })
+        },
+        remove(name, options) {
+          cookies().set({ name, value: '', ...options, maxAge: 0 })
+        },
+      },
+    }
+  )
 
   const {
     data: { session },
