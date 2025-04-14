@@ -1,25 +1,37 @@
-// middleware.ts
-import { type NextRequest } from 'next/server'
-import { createMiddlewareClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
 
-export async function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+export default async function DashboardPage() {
+  const supabase = createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
-  const supabase = createMiddlewareClient({
-    req: request,
-    res: response
+  if (!user) {
+    redirect('/login?error=session')
+  }
+
+  const usageRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/usage`, {
+    headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}` },
+    cache: 'no-store',
   })
 
-  // Refresh session if needed
-  await supabase.auth.getSession()
+  const usage = await usageRes.json()
 
-  return response
-}
+  return (
+    <div className="min-h-screen bg-black text-white font-sans">
+      <header className="p-6 border-b border-gray-700 flex justify-between items-center">
+        <h1 className="text-xl font-bold">Welcome {user.email}</h1>
+        <form method="post" action="/logout">
+          <button type="submit" className="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+        </form>
+      </header>
 
-export const config = {
-  matcher: [
-    // Run middleware on all routes except static/image assets & API routes
-    '/((?!_next/static|_next/image|favicon.ico|api/).*)',
-  ],
+      <main className="p-8">
+        <h2 className="text-3xl font-bold text-green-400 mb-4">🔐 API Dashboard</h2>
+        <p>Your API Key: <code>{usage.api_key}</code></p>
+        <p>Tier: {usage.tier}</p>
+        <p>Used: {usage.usage_count} / {usage.limit}</p>
+        <p>Remaining: {usage.limit - usage.usage_count}</p>
+      </main>
+    </div>
+  )
 }
