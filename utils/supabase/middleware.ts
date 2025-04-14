@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest): Promise<any> {
-  const cookieStore = cookies(); // no await here
+  const cookieStore = cookies(); // ✅ synchronous, no await
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,11 +23,11 @@ export async function updateSession(request: NextRequest): Promise<any> {
         }
       }
     }
-  );
+  )
 
   const {
     data: { user }
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser()
 
-  return user;
+  return user
 }
