@@ -1,14 +1,25 @@
 // middleware.ts
 import { type NextRequest } from 'next/server'
-import { updateSession } from './utils/supabase/middleware'
+import { createMiddlewareClient } from '@supabase/ssr'
+import { NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  const response = NextResponse.next()
+
+  const supabase = createMiddlewareClient({
+    req: request,
+    res: response
+  })
+
+  // Refresh session if needed
+  await supabase.auth.getSession()
+
+  return response
 }
 
 export const config = {
   matcher: [
-    // Exclude static assets from middleware
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Run middleware on all routes except static/image assets & API routes
+    '/((?!_next/static|_next/image|favicon.ico|api/).*)',
   ],
 }

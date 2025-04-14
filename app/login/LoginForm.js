@@ -1,75 +1,57 @@
-'use client';
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/utils/supabase/client'
+import { FcGoogle } from 'react-icons/fc'
+import { FaGithub, FaLinkedin } from 'react-icons/fa'
 
 export default function LoginForm() {
-  const router = useRouter();
-  const [from, setFrom] = useState('/dashboard');
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const router = useRouter()
+  const supabase = createClient()
 
-  useEffect(() => {
-    if (router.isReady) {
-      const url = new URLSearchParams(window.location.search);
-      setFrom(url.get('from') || '/dashboard');
-    }
-  }, [router.isReady]);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
 
-    const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
-    if (loginError) {
-      setError(loginError.message);
-      console.error("Login error:", loginError.message);
-      setLoading(false);
-      return;
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else {
+      router.push('/dashboard')
     }
+  }
 
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (!session?.user) {
-      setError("Session not found after login");
-      console.error("Session error:", sessionError);
-      setLoading(false);
-      return;
-    }
-
-    router.push(from);
-    router.refresh();
-  };
-
-  const handleOAuth = async (provider) => {
+  const handleOAuthLogin = async (provider) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: 'https://qbitshield.com/api/auth/callback?redirect=/dashboard'
+        redirectTo: 'https://qbitshield.com/auth/callback',
       },
-    });
-    if (error) console.error(`${provider} login failed:`, error.message);
-  };
+    })
 
-  const handleForgotPassword = async () => {
-    const email = prompt("Enter your email to reset password");
-    if (!email) return;
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://qbitshield.com/reset-password',
-    });
-
-    if (error) alert('Reset failed: ' + error.message);
-    else alert('Password reset email sent!');
-  };
+    if (error) {
+      console.error(`${provider} login error:`, error.message)
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
-      <form onSubmit={handleLogin} className="w-full max-w-sm p-6 border border-gray-700 rounded bg-zinc-900 shadow space-y-4">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-sm p-6 border border-gray-700 rounded bg-zinc-900 shadow space-y-4"
+      >
         <h1 className="text-2xl font-bold text-center">Log In</h1>
 
         <input
@@ -89,13 +71,17 @@ export default function LoginForm() {
           className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded"
         />
 
-        <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded">
-          Log In
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded"
+        >
+          {loading ? 'Logging in...' : 'Log In'}
         </button>
 
         <button
           type="button"
-          onClick={() => handleOAuth("google")}
+          onClick={() => handleOAuthLogin('google')}
           className="flex items-center justify-center w-full px-4 py-2 bg-white text-black font-semibold rounded hover:bg-gray-200"
         >
           <FcGoogle className="mr-2 text-xl" /> Log in with Google
@@ -103,7 +89,7 @@ export default function LoginForm() {
 
         <button
           type="button"
-          onClick={() => handleOAuth("github")}
+          onClick={() => handleOAuthLogin('github')}
           className="flex items-center justify-center w-full px-4 py-2 bg-zinc-800 text-white font-semibold rounded hover:bg-zinc-700"
         >
           <FaGithub className="mr-2 text-xl" /> Log in with GitHub
@@ -111,32 +97,33 @@ export default function LoginForm() {
 
         <button
           type="button"
-          onClick={() => handleOAuth("linkedin_oidc")}
+          onClick={() => handleOAuthLogin('linkedin_oidc')}
           className="flex items-center justify-center w-full px-4 py-2 bg-blue-700 text-white font-semibold rounded hover:bg-blue-800"
         >
           <FaLinkedin className="mr-2 text-xl" /> Log in with LinkedIn
         </button>
 
-        <p className="text-sm text-center text-gray-400">
-          Don’t have an account? <a href="/signup" className="text-blue-400 hover:underline">Sign up here</a>
-        </p>
+        {error && (
+          <p className="text-red-400 text-sm text-center">❌ {error}</p>
+        )}
 
         <p className="text-sm text-center text-gray-400">
-          <button
-            onClick={handleForgotPassword}
-            type="button"
-            className="text-blue-400 hover:underline"
-          >
-            Forgot your password?
-          </button>
+          Don’t have an account?{' '}
+          <a href="/signup" className="text-blue-400 hover:underline">
+            Sign up here
+          </a>
         </p>
-
-        {error && <p className="text-red-400 text-sm text-center">❌ {error}</p>}
 
         <p className="text-xs text-center text-gray-500 mt-4">
-          <a href="/privacy" className="hover:underline">Privacy Policy</a> • <a href="/terms" className="hover:underline">Terms of Service</a>
+          <a href="/privacy" className="hover:underline">
+            Privacy Policy
+          </a>{' '}
+          •{' '}
+          <a href="/terms" className="hover:underline">
+            Terms of Service
+          </a>
         </p>
       </form>
     </div>
-  );
+  )
 }

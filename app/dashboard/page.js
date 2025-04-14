@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { createClient } from '@/utils/supabase/client';
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -12,10 +12,7 @@ export default function DashboardPage() {
   const [checkingSession, setCheckingSession] = useState(true);
   const router = useRouter();
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const supabase = createClient();
 
   useEffect(() => {
     const init = async () => {
@@ -48,7 +45,7 @@ export default function DashboardPage() {
     };
 
     init();
-  }, [router, supabase.auth]);
+  }, [router]);
 
   if (checkingSession) {
     return (
