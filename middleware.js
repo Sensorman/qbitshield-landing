@@ -3,11 +3,11 @@ import { createMiddlewareClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-export async function middleware(req) {
-  const res = NextResponse.next()
+export async function middleware(request) {
+  const response = NextResponse.next()
 
   const supabase = createMiddlewareClient({
-    cookies,
+    cookies: () => cookies(), // Correctly inject the cookie getter
   })
 
   const {
@@ -15,13 +15,13 @@ export async function middleware(req) {
     error,
   } = await supabase.auth.getSession()
 
-  console.log('📡 SESSION FROM MIDDLEWARE:', session, error)
+  console.log('📡 Middleware session:', session, error)
 
-  if (!session?.user && req.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', req.url))
+  if (!session?.user && request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  return res
+  return response
 }
 
 export const config = {
