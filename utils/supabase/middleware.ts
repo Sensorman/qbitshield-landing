@@ -1,33 +1,11 @@
-'use server'
+import { type NextRequest, NextResponse } from 'next/server'
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import type { NextRequest } from 'next/server'
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
 
-export async function updateSession(request: NextRequest): Promise<any> {
-  const cookieStore = await cookies(); // Note: cookies() is now async in Next.js 15+
+  await supabase.auth.getSession() // Refresh session if needed
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name, value, options) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name, options) {
-          cookieStore.set({ name, value: '', ...options });
-        }
-      }
-    }
-  )
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser()
-
-  return user
+  return res
 }
