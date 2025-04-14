@@ -7,10 +7,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/dashboard',
-    '/account',
-    '/settings',
-    // Add other protected routes if needed
-  ],
+  matcher: ['/dashboard', '/account', '/settings']
 }

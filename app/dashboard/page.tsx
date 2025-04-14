@@ -1,21 +1,24 @@
+// app/dashboard/page.tsx
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
   const supabase = createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login?error=session')
+  if (!user || userError) {
+    return redirect('/login?error=session')
   }
 
   const usageRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/usage`, {
     headers: {
       'Content-Type': 'application/json'
     },
-    // optionally pass the cookie if needed
-    credentials: 'include',
+    credentials: 'include'
   })
 
   const usage = await usageRes.json()
@@ -23,6 +26,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
+        <h1 className="text-xl font-bold">Welcome, {user.email}</h1>
         <form method="post" action="/logout">
           <button type="submit" className="bg-red-500 text-white px-4 py-2 rounded">
             Logout
