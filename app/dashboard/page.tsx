@@ -1,9 +1,10 @@
 // app/dashboard/page.tsx
-import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function DashboardPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
+
   const {
     data: { user },
     error: userError
@@ -32,6 +33,7 @@ export default async function DashboardPage() {
 
       <main className="p-8">
         <h2 className="text-3xl font-bold text-green-400 mb-4">🔐 API Dashboard</h2>
+
         <p>Your API Key: <code>{usage.api_key}</code></p>
         <p>Tier: {usage.tier}</p>
         <p>Used: {usage.usage_count} / {usage.limit}</p>
