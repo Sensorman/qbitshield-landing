@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   await supabase.auth.exchangeCodeForSession()
 
   return NextResponse.redirect(new URL('/dashboard', request.url))
-}
+
 
   // 🧠 CRITICAL: exchange auth code for session!
   await supabase.auth.exchangeCodeForSession()
