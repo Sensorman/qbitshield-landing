@@ -1,4 +1,4 @@
-// utils/supabase/server.ts
+// ✅ Final Version — NO MANUAL COOKIE PARSING!
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
