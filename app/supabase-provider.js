@@ -1,6 +1,6 @@
 // app/supabase-provider.js
 'use client'
-import { createBrowserClient } from '@supabase/ssr'
+import { createBrowserClient } from '@supabase/auth-helpers-nextjs'
 import { createContext, useContext, useState, useEffect } from 'react'
 
 const SupabaseContext = createContext()
