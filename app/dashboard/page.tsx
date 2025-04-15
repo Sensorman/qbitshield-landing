@@ -1,5 +1,4 @@
-// app/dashboard/page.tsx
-'use client'
+// ✅ NO 'use client' here
 
 import { redirect } from 'next/navigation'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
