@@ -1,9 +1,12 @@
 // app/dashboard/page.tsx
+'use client'
+
 import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const supabase = createServerComponentClient({ cookies })
 
   const {
     data: { user },
