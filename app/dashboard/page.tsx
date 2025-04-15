@@ -1,5 +1,3 @@
-// ✅ NO 'use client' here
-
 import { redirect } from 'next/navigation'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
@@ -12,23 +10,18 @@ export default async function DashboardPage() {
     error
   } = await supabase.auth.getUser()
 
-  if (!user || error) redirect('/login')
-
-}
+  if (!user || error) {
+    redirect('/login')
+  }
 
   const usageRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/usage`, {
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include'
   })
 
-  const usageRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/usage`, {
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include'
-})
+  const usage = await usageRes.json()
 
-const usage = await usageRes.json()
-
-return (
+  return (
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
         <form method="post" action="/logout">
@@ -40,7 +33,6 @@ return (
 
       <main className="p-8">
         <h2 className="text-3xl font-bold text-green-400 mb-4">🔐 API Dashboard</h2>
-
         <p>Your API Key: <code>{usage.api_key}</code></p>
         <p>Tier: {usage.tier}</p>
         <p>Used: {usage.usage_count} / {usage.limit}</p>
