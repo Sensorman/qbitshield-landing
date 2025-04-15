@@ -4,9 +4,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const supabase = createRouteHandlerClient<any>({ cookies }) // added <any> to satisfy typing
 
-  // ✅ Fix: pass the request to exchangeCodeForSession()
+  // ✅ FIX: pass request to properly typed auth helper
   await supabase.auth.exchangeCodeForSession({ request })
 
   const redirectUrl = new URL(request.url)
