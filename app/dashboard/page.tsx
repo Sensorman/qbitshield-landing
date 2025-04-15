@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerComponentClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+
+
 
 export default async function DashboardPage() {
   const supabase = createServerComponentClient({ cookies })
@@ -13,6 +15,10 @@ export default async function DashboardPage() {
   if (!user || error) {
     redirect('/login')
   }
+
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
+
 
   const usageRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/usage`, {
     headers: { 'Content-Type': 'application/json' },
