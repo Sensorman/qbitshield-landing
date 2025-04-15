@@ -9,12 +9,12 @@ export default async function DashboardPage() {
 
   const {
     data: { user },
-    error: userError
+    error
   } = await supabase.auth.getUser()
 
-  if (!user || userError) {
-    redirect('/login?error=session')
-  }
+  if (!user || error) redirect('/login')
+
+}
 
   const usageRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/usage`, {
     headers: { 'Content-Type': 'application/json' },
