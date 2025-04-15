@@ -2,7 +2,7 @@
 'use client'
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { createClient } from "@/utils/supabase/client"
 
 export default function SignupForm() {
   const router = useRouter()
@@ -11,8 +11,11 @@ export default function SignupForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
 
+  const supabase = createClient() // ✅ use modern client hook
+
   const handleSignup = async (e) => {
     e.preventDefault()
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,

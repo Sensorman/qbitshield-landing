@@ -1,12 +1,14 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/client';
 
 export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
+
+  const supabase = createClient(); // ✅ load browser-side supabase client
 
   const handleSubmit = async () => {
     if (newPassword.length < 6) {

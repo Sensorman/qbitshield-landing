@@ -1,10 +1,11 @@
 "use client"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase.js"
+import { createClient } from "@/utils/supabase/client"
 
 export default function CallbackPage() {
   const router = useRouter()
+  const supabase = createClient()
 
   useEffect(() => {
     const checkSession = async () => {
@@ -23,7 +24,7 @@ export default function CallbackPage() {
     }
 
     checkSession()
-  }, [])
+  }, [supabase, router]) // ✅ Include dependencies
 
   return <p className="text-white">Verifying login...</p>
 }

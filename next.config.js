@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-export default nextConfig;
-
-export const config = {
-  matcher: ['/dashboard/:path*'],
+const nextConfig = {
+  reactStrictMode: true,
+  experimental: {
+    serverActions: true,
+  },
 }
+
+export default nextConfig
