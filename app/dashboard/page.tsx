@@ -21,9 +21,14 @@ export default async function DashboardPage() {
     credentials: 'include'
   })
 
-  const usage = await usageRes.json()
+  const usageRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/usage`, {
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include'
+})
 
-  return (
+const usage = await usageRes.json()
+
+return (
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
         <form method="post" action="/logout">
