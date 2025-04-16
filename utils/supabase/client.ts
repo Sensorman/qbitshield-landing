@@ -1,6 +1,5 @@
-// utils/supabase/client.ts
-import { createBrowserClient } from '@supabase/auth-helpers-react'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-react'
 
 export function createClient() {
-  return createBrowserClient()
+  return createBrowserSupabaseClient()
 }
