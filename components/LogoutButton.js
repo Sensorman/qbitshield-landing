@@ -1,10 +1,12 @@
 'use client'
+
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 
 export default function LogoutButton() {
   const router = useRouter()
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient()) // ✅ safe for hydration & runtime
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

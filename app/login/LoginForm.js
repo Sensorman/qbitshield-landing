@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { FcGoogle } from 'react-icons/fc'
@@ -8,7 +8,7 @@ import { FaGithub, FaLinkedin } from 'react-icons/fa'
 
 export default function LoginForm() {
   const router = useRouter()
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient()) // ✅ use inside state-safe wrapper
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -34,7 +34,7 @@ export default function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`, // ✅ universal
+        redirectTo: `${window.location.origin}/auth/callback`, // ✅ universal + Vercel-safe
       },
     })
 
@@ -112,13 +112,8 @@ export default function LoginForm() {
         </p>
 
         <p className="text-xs text-center text-gray-500 mt-4">
-          <a href="/privacy" className="hover:underline">
-            Privacy Policy
-          </a>{' '}
-          •{' '}
-          <a href="/terms" className="hover:underline">
-            Terms of Service
-          </a>
+          <a href="/privacy" className="hover:underline">Privacy Policy</a> •{' '}
+          <a href="/terms" className="hover:underline">Terms of Service</a>
         </p>
       </form>
     </div>
