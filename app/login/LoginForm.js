@@ -41,6 +41,8 @@ export default function LoginForm() {
     if (error) {
       console.error(`${provider} login error:`, error.message)
     }
+
+
   }
 
   return (
