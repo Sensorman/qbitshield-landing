@@ -9,8 +9,8 @@ const __dirname = dirname(__filename)
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-  serverActions: {}
-}
+    serverActions: {} // ✅ Must be an object, not true/false
+  },
   webpack(config) {
     config.resolve.alias['@'] = path.resolve(__dirname)
     return config
