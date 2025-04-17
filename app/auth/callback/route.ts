@@ -1,31 +1,28 @@
+// app/api/auth/callback/route.ts
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies()
+  const cookieStore = cookies()
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: () => {},
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set() {},
+        remove() {},
       },
     }
   )
 
-  // ✅ Convert to native Request before passing
-  const rawRequest = new Request(request.url, {
-    method: request.method,
-    headers: request.headers,
-    body: request.body,
-    redirect: 'manual',
-  })
-
-  await (supabase.auth as any).exchangeCodeForSession({ request: rawRequest })
+  // ✅ This works fine in '@supabase/ssr'
+  await supabase.auth.exchangeCodeForSession(request)
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
