@@ -4,7 +4,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const cookieStore = cookies() // ✅ Await it properly
+  import { cookies } from 'next/headers'
+
+const cookieStore = cookies()
 
 const supabase = createServerClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,7 +14,7 @@ const supabase = createServerClient(
   {
     cookies: {
       getAll() {
-        return cookieStore.getAll() // ✅ This works now
+        return cookieStore.getAll()
       },
       setAll(cookiesToSet) {
         try {
@@ -20,10 +22,10 @@ const supabase = createServerClient(
             cookieStore.set(name, value, options)
           })
         } catch {
-          // Ignore in server components
+          // SSR failover (expected)
         }
-      },
-    },
+      }
+    }
   }
 )
 
