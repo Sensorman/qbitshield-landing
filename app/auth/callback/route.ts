@@ -1,11 +1,14 @@
-// app/api/auth/callback/route.ts
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const cookieStore = cookies()
+  // 🧠 Await the cookieStore!
+  const cookieStore = cookies() // ❌ old code (Promise<...>)
+
+  // ✅ FIX HERE
+  const allCookies = await cookieStore
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,7 +16,7 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
+          return allCookies.get(name)?.value // ✅ now it's safe
         },
         set() {},
         remove() {},
@@ -21,7 +24,6 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  // ✅ This works fine in '@supabase/ssr'
   await supabase.auth.exchangeCodeForSession(request)
 
   const redirectUrl = new URL(request.url)
