@@ -25,12 +25,16 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser()
 
   if (!user || error) {
-    redirect('/login')
+    return redirect('/login')
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
   const usageRes = await fetch(`${baseUrl}/api/usage`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      // 👇 forward cookies manually for API routes
+      cookie: cookieStore.toString(),
+    },
     credentials: 'include',
   })
 
