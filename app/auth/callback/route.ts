@@ -27,10 +27,14 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  await (supabase.auth as any).exchangeCodeForSession(request)
+  // ✅ Extract code from URL
+  const { searchParams } = new URL(request.url)
+  const code = searchParams.get('code')
 
-  const redirectUrl = new URL(request.url)
-  const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code)
+  }
 
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
   return NextResponse.redirect(new URL(redirectTo, request.url))
 }
