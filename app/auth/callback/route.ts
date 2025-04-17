@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const supabase = createClient()
 
   // 🧠 This handles the code exchange!
-  await supabase.auth.exchangeCodeForSession(request)
+  await supabase.auth.exchangeCodeForSession({ request })
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
