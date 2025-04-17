@@ -1,18 +1,38 @@
 // middleware.ts
 import { type NextRequest, NextResponse } from 'next/server'
-import { createMiddlewareClient } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
-  const supabase = createMiddlewareClient({
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    request,
-    response,
-  })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value
+        },
+        set(name, value, options) {
+          response.cookies.set(name, value, options)
+        },
+        remove(name, options) {
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+            maxAge: 0
+          })
+        },
+      },
+    }
+  )
 
   await supabase.auth.getSession()
 
   return response
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/account/:path*', '/settings/:path*'],
 }
