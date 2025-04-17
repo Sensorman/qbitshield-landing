@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 
-const cookieStore = cookies()
+const cookieStore = await cookies()
 
 export default async function DashboardPage() {
   const supabase = createServerClient(

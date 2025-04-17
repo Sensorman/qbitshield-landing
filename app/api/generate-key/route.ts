@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const cookieStore = cookies() // ✅ Await it properly
+  const cookieStore = await cookies() // ✅ Await it properly
 
 const supabase = createServerClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,16 +11,16 @@ const supabase = createServerClient(
   {
     cookies: {
       getAll() {
-        return cookieStore.getAll() // ✅ This works now
-      },
-      setAll(cookiesToSet) {
-        try {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
-        } catch {
-          // Ignore in server components
-        }
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // SSR-safe fallback
+          }
       },
     },
   }
