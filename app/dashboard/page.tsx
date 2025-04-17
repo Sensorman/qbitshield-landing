@@ -1,9 +1,22 @@
-import { redirect } from 'next/navigation'
+// app/dashboard/page.tsx
 import { cookies } from 'next/headers'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { redirect } from 'next/navigation'
+import { createServerClient } from '@supabase/ssr'
 
 export default async function DashboardPage() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookies().get(name)?.value
+        },
+        set() {},
+        remove() {},
+      },
+    }
+  )
 
   const {
     data: { user },
@@ -11,11 +24,10 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser()
 
   if (!user || error) {
-    redirect('/login')
+    return redirect('/login')
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
-
   const usageRes = await fetch(`${baseUrl}/api/usage`, {
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

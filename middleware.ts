@@ -1,9 +1,18 @@
+// middleware.ts
 import { type NextRequest, NextResponse } from 'next/server'
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { createMiddlewareClient } from '@supabase/ssr'
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
-  const supabase = createMiddlewareClient({ req: request, res: response })
+
+  const supabase = createMiddlewareClient({
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    getCookie: (name) => request.cookies.get(name)?.value,
+    setCookie: (name, value, options) => {
+      response.cookies.set({ name, value, ...options })
+    },
+  })
 
   const {
     data: { session },
@@ -17,9 +26,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/account/:path*',
-    '/settings/:path*',
-  ],
+  matcher: ['/dashboard/:path*', '/account/:path*', '/settings/:path*'],
 }

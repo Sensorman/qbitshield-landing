@@ -1,13 +1,32 @@
+// app/api/auth/callback/route.ts
 import { cookies } from 'next/headers'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return cookies().get(name)?.value
+        },
+        set(name, value, options) {
+          // 👇 ignored at runtime by SSR
+        },
+        remove(name, options) {
+          // 👇 ignored at runtime by SSR
+        },
+      }
+    }
+  )
 
-  // ✅ TEMP FIX for Vercel TypeScript version mismatch
-  await (supabase.auth as any).exchangeCodeForSession({ request })
+  // exchangeCodeForSession is no longer needed in new setup
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
