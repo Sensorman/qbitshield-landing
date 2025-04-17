@@ -16,25 +16,27 @@ export async function GET(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => {
+            cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
-            })
+            )
           } catch {
-            // Silent fail in server environments
+            // ignore set error on server
           }
         },
       },
     }
   )
 
-  // ✅ Extract code from URL
+  // ✅ Extract the `code` param from the URL
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
 
+  // ✅ Perform PKCE code exchange (this is crucial)
   if (code) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
   const redirectTo = searchParams.get('redirect') || '/dashboard'
+
   return NextResponse.redirect(new URL(redirectTo, request.url))
 }
