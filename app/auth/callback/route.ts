@@ -4,11 +4,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  // 🧠 Await the cookieStore!
-  const cookieStore = cookies() // ❌ old code (Promise<...>)
-
-  // ✅ FIX HERE
-  const allCookies = await cookieStore
+  const cookieStore = cookies()
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,7 +12,7 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         get(name: string) {
-          return allCookies.get(name)?.value // ✅ now it's safe
+          return cookieStore.get(name)?.value
         },
         set() {},
         remove() {},
@@ -24,7 +20,8 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  await supabase.auth.exchangeCodeForSession(request)
+  // ✅ This is the correct usage
+  await supabase.auth.exchangeCodeForSession({ request })
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
