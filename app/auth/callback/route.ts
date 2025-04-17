@@ -11,25 +11,23 @@ export async function GET(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
+        getAll() {
+          return cookieStore.getAll()
         },
-        set() {},
-        remove() {},
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          } catch {
+            // Silent fail in server environments
+          }
+        },
       },
     }
   )
 
-  // ✅ Convert NextRequest to native Request
-  const rawRequest = new Request(request.url, {
-    method: request.method,
-    headers: request.headers,
-    body: request.body,
-    redirect: 'manual',
-  })
-
-  // ✅ Use rawRequest for proper compatibility
-  await supabase.auth.exchangeCodeForSession(rawRequest)
+  await (supabase.auth as any).exchangeCodeForSession(request)
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
