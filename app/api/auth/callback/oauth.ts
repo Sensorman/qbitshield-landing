@@ -4,6 +4,8 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const cookieStore = await cookies();
+
 export async function GET(request: NextRequest) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,7 +13,7 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         get(name) {
-          return cookies().get(name)?.value
+          return cookieStore.get(name)?.value;
         },
         set(name, value, options) {
           // 👇 ignored at runtime by SSR
