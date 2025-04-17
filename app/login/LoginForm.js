@@ -8,7 +8,7 @@ import { FaGithub, FaLinkedin } from 'react-icons/fa'
 
 export default function LoginForm() {
   const router = useRouter()
-  const [supabase] = useState(() => createClient()) // ✅ use inside state-safe wrapper
+  const [supabase] = useState(() => createClient())
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
