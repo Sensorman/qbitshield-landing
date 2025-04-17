@@ -12,12 +12,20 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: () => {}, // noop in route handlers
+        setAll: () => {},
       },
     }
   )
 
-  await supabase.auth.exchangeCodeForSession(request)
+  // ✅ Convert to native Request before passing
+  const rawRequest = new Request(request.url, {
+    method: request.method,
+    headers: request.headers,
+    body: request.body,
+    redirect: 'manual',
+  })
+
+  await supabase.auth.exchangeCodeForSession({ request: rawRequest })
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'

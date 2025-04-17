@@ -10,7 +10,7 @@ export default function TermsPage() {
       <h1 className="text-3xl font-bold text-green-400 mb-6 text-center">
         Terms of Service
       </h1>
-
+x
       <p className="mb-4 text-zinc-300">
         By accessing and using QbitShield, you agree to the following terms and conditions.
       </p>
