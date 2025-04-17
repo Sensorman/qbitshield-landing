@@ -1,20 +1,19 @@
-// ✅ app/api/usage/route.ts
-
+// ✅ FIXED: app/api/usage/route.ts
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const cookieStore = await cookies();
-
 export async function GET(request: NextRequest) {
+  const cookieStore = cookies()  // <-- MUST be inside handler
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name) {
-          return cookieStore.get(name)?.value;
+          return cookieStore.get(name)?.value
         },
       },
     }
@@ -23,8 +22,6 @@ export async function GET(request: NextRequest) {
   const {
     data: { session },
   } = await supabase.auth.getSession()
-
-  console.log('🧠 Supabase session:', session)
 
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -35,8 +32,6 @@ export async function GET(request: NextRequest) {
     .select('*')
     .eq('user_id', session.user.id)
     .maybeSingle()
-
-  console.log('📊 Usage row fetched:', data)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
