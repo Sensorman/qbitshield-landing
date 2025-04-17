@@ -8,10 +8,13 @@ export default function LogoutButton() {
   const router = useRouter()
   const [supabase] = useState(() => createClient()) // ✅ safe for hydration & runtime
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
+  const [loading, setLoading] = useState(false)
+
+const handleLogout = async () => {
+  setLoading(true)
+  await supabase.auth.signOut()
+  router.push('/login')
+}
 
   return (
     <button

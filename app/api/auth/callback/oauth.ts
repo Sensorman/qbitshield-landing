@@ -1,31 +1,33 @@
-// app/api/auth/callback/route.ts
+// app/api/auth/callback/oauth.ts
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const cookieStore = await cookies();
-
 export async function GET(request: NextRequest) {
+  const cookieStore = cookies() // no `await`
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value;
+        getAll() {
+          return cookieStore.getAll()
         },
-        set(name, value, options) {
-          // 👇 ignored at runtime by SSR
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // safe to ignore in SSR context
+          }
         },
-        remove(name, options) {
-          // 👇 ignored at runtime by SSR
-        },
-      }
+      },
     }
   )
 
-  // exchangeCodeForSession is no longer needed in new setup
   const {
     data: { session },
   } = await supabase.auth.getSession()

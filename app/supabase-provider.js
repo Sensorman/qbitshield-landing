@@ -21,4 +21,6 @@ export const SupabaseProvider = ({ children }) => {
   )
 }
 
+
+
 export const useSupabase = () => useContext(SupabaseContext)

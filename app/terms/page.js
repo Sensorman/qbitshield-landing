@@ -1,3 +1,5 @@
+///Users/wd/qbitshield-landing/app/terms/page.js
+
 "use client";
 
 import Link from "next/link";

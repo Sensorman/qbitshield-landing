@@ -8,23 +8,11 @@ export async function middleware(request: NextRequest) {
   const supabase = createMiddlewareClient({
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    getCookie: (name) => request.cookies.get(name)?.value,
-    setCookie: (name, value, options) => {
-      response.cookies.set({ name, value, ...options })
-    },
+    request,
+    response,
   })
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
+  await supabase.auth.getSession()
 
   return response
-}
-
-export const config = {
-  matcher: ['/dashboard/:path*', '/account/:path*', '/settings/:path*'],
 }

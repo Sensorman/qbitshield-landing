@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { FcGoogle } from 'react-icons/fc'
@@ -8,7 +8,7 @@ import { FaGithub, FaLinkedin } from 'react-icons/fa'
 
 export default function LoginForm() {
   const router = useRouter()
-  const [supabase] = useState(() => createClient())
+  const [supabase] = useState(() => createClient()) // ✅ wrapped in lazy safe-state
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,25 +24,25 @@ export default function LoginForm() {
 
     if (error) {
       setError(error.message)
-      setLoading(false)
     } else {
       router.push('/dashboard')
     }
+
+    setLoading(false)
   }
 
   const handleOAuthLogin = async (provider) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`, // ✅ universal + Vercel-safe
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
 
     if (error) {
       console.error(`${provider} login error:`, error.message)
+      setError(error.message)
     }
-
-
   }
 
   return (
@@ -61,6 +61,7 @@ export default function LoginForm() {
           required
           className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded"
         />
+
         <input
           type="password"
           placeholder="Password"
