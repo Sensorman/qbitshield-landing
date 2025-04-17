@@ -4,31 +4,21 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies() // ✅ no await!
+  const cookieStore = await cookies()
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set() {},
-        remove() {},
+        getAll: () => cookieStore.getAll(),
+        setAll: () => {},
       },
     }
   )
 
-  // ✅ Supabase expects a plain Request object, not NextRequest
-  const rawRequest = new Request(request.url, {
-    headers: request.headers,
-    method: request.method,
-    body: request.body,
-    redirect: 'manual',
-  })
-
-  await supabase.auth.exchangeCodeForSession(rawRequest)
+  // ✅ Must wrap in object { request }
+  await supabase.auth.exchangeCodeForSession({ request })
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
