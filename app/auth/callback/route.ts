@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     redirect: 'manual',
   })
 
-  await supabase.auth.exchangeCodeForSession({ request: rawRequest })
+  await (supabase.auth as any).exchangeCodeForSession({ request: rawRequest })
 
   const redirectUrl = new URL(request.url)
   const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
