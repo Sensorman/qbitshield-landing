@@ -1,11 +1,10 @@
-// app/dashboard/page.tsx
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 
-const cookieStore = await cookies()
-
 export default async function DashboardPage() {
+  const cookieStore = cookies()
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -26,23 +25,16 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser()
 
   if (!user || error) {
-    return redirect('/login')
+    redirect('/login')
   }
 
-  // ✅ Direct Supabase fetch instead of calling internal API route
-  const { data: usage, error: usageError } = await supabase
-    .from('usage')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle()
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
+  const usageRes = await fetch(`${baseUrl}/api/usage`, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  })
 
-  if (usageError || !usage) {
-    return (
-      <div className="p-10 text-red-500">
-        Error fetching usage data. Please try again later.
-      </div>
-    )
-  }
+  const usage = await usageRes.json()
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
