@@ -16,25 +16,28 @@ export async function GET(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => {
+            cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
-            })
+            )
           } catch {
-            // Silent fail in server environments
+            // SSR-safe silent fail
           }
         },
       },
     }
   )
 
-  // ✅ Extract code from URL
-  const { searchParams } = new URL(request.url)
-  const code = searchParams.get('code')
+  // ✅ Convert NextRequest to native Request (per Supabase docs)
+  const requestUrl = new Request(request.url, {
+    headers: request.headers,
+    method: request.method,
+  })
 
-  if (code) {
-    await supabase.auth.exchangeCodeForSession(code)
-  }
+  // ✅ Exchange code for session properly
+  await supabase.auth.exchangeCodeForSession(requestUrl)
 
-  const redirectTo = searchParams.get('redirect') || '/dashboard'
+  const redirectUrl = new URL(request.url)
+  const redirectTo = redirectUrl.searchParams.get('redirect') || '/dashboard'
+
   return NextResponse.redirect(new URL(redirectTo, request.url))
 }
