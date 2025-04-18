@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
-import { createServerClient } from '@supabase/ssr'
 import { redirect } from 'next/navigation'
+import { createServerClient } from '@supabase/ssr'
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
@@ -13,31 +13,32 @@ export default async function DashboardPage() {
         get(name: string) {
           return cookieStore.get(name)?.value
         },
-        set() {}, // not used here
-        remove() {}, // not used here
+        set() {},
+        remove() {},
       },
     }
   )
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
   if (!user || error) {
     redirect('/login')
   }
 
-  // ✅ Instead of fetch(), use Supabase directly
-  const { data: usage, error: usageError } = await supabase
-    .from('usage')
-    .select('*')
-    .eq('user_id', user.id)
-    .single()
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const usageRes = await fetch(`${baseUrl}/api/usage`, {
+    headers: {
+      'Content-Type': 'application/json',
+      // Optional: add auth header if needed
+    },
+    cache: 'no-store',
+  })
 
-  if (usageError || !usage) {
-    redirect('/login?error=NoUsageData')
+  if (!usageRes.ok) {
+    throw new Error('Failed to load usage')
   }
+
+  const usage = await usageRes.json()
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
