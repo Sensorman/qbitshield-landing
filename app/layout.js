@@ -12,7 +12,7 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://qbitshield.com/og-image.png', // Make sure this exists in /public
+        url: 'https://qbitshield.com/og-image.png',
         width: 1200,
         height: 630,
         alt: 'QbitShield Cover Image',
@@ -25,7 +25,8 @@ export const metadata = {
     description: 'Quantum encryption using prime numbers. Secure. Deterministic. Patent pending.',
     images: ['https://qbitshield.com/og-image.png'],
   },
-};
+};  // ✅ Make sure this is the ONLY closing brace + semicolon
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,13 +38,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "QbitShield",
-  description: "Quantum-Safe Key Infrastructure",
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+
 
 export default function RootLayout({ children }) {
   return (
