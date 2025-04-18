@@ -1,5 +1,5 @@
 // app/login/page.js
-import LoginForm from './LoginForm'
+import LoginForm from './LoginForm.js'
 
 export default function LoginPage() {
   return (

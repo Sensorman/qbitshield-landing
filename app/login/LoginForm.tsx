@@ -1,26 +1,30 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaLinkedin } from 'react-icons/fa'
+import type { Provider } from '@supabase/supabase-js'
 
 export default function LoginForm() {
   const router = useRouter()
-  const [supabase] = useState(() => createClient()) // ✅ wrapped in lazy safe-state
+  const [supabase] = useState(() => createClient())
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
     if (error) {
       setError(error.message)
@@ -31,11 +35,11 @@ export default function LoginForm() {
     setLoading(false)
   }
 
-  const handleOAuthLogin = async (provider) => {
+  const handleOAuthLogin = async (provider: Provider) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-       redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
       },
     })
 

@@ -61,7 +61,7 @@ Open http://localhost:3000 in your browser.
 │   ├── api/                → API Routes (SSR w/ Supabase)
 │   ├── dashboard/          → Protected page
 │   ├── auth/, login/, signup/, reset-password/
-│   └── layout.js, page.js  → Root layout + home
+│   └── layout.js, page.tsx  → Root layout + home
 ├── components/             → Reusable UI components
 ├── utils/supabase/         → SSR/CSR/Middleware clients
 ├── public/                 → Static assets (logo, SVGs)
