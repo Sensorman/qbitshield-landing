@@ -1,10 +1,28 @@
 "use client";
 
 import Image from 'next/image';
+import Head from 'next/head';
 
 
 export default function Home() {
   return (
+      <Head>
+  <title>QbitShield | Quantum Encryption Powered by Primes</title>
+  <meta name="description" content="QbitShield uses Prime Harmonic Modulation to deliver post-quantum secure keys for defense, infrastructure, and next-gen cybersecurity." />
+
+  {/* Open Graph for rich previews */}
+  <meta property="og:title" content="QbitShield" />
+  <meta property="og:description" content="Quantum-safe key infrastructure powered by Prime Harmonic Modulation." />
+  <meta property="og:image" content="https://qbitshield.com/og-image.png" />
+  <meta property="og:url" content="https://qbitshield.com" />
+  <meta property="og:type" content="website" />
+
+  {/* Twitter card */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="QbitShield" />
+  <meta name="twitter:description" content="Quantum encryption using prime numbers. Secure. Deterministic. Patent pending." />
+  <meta name="twitter:image" content="https://qbitshield.com/og-image.png" />
+</Head>
     <div className="min-h-screen bg-black text-white font-sans">
       <header className="p-6 border-b border-gray-700 flex justify-between items-center">
         <Image
