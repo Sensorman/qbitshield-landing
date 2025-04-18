@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
+import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
@@ -13,8 +13,8 @@ export default async function DashboardPage() {
         get(name: string) {
           return cookieStore.get(name)?.value
         },
-        set() {},
-        remove() {},
+        set() {}, // not used here
+        remove() {}, // not used here
       },
     }
   )
@@ -25,20 +25,19 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser()
 
   if (!user || error) {
-    return redirect('/login')
+    redirect('/login')
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
-  const usageRes = await fetch(`${baseUrl}/api/usage`, {
-    headers: {
-      'Content-Type': 'application/json',
-      // 👇 forward cookies manually for API routes
-      cookie: cookieStore.toString(),
-    },
-    credentials: 'include',
-  })
+  // ✅ Instead of fetch(), use Supabase directly
+  const { data: usage, error: usageError } = await supabase
+    .from('usage')
+    .select('*')
+    .eq('user_id', user.id)
+    .single()
 
-  const usage = await usageRes.json()
+  if (usageError || !usage) {
+    redirect('/login?error=NoUsageData')
+  }
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
