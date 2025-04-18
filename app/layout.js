@@ -2,6 +2,31 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+export const metadata = {
+  title: 'QbitShield | Quantum Encryption Powered by Primes',
+  description: 'QbitShield uses Prime Harmonic Modulation to deliver post-quantum secure keys for defense, infrastructure, and next-gen cybersecurity.',
+  openGraph: {
+    title: 'QbitShield',
+    description: 'Quantum-safe key infrastructure powered by Prime Harmonic Modulation.',
+    url: 'https://qbitshield.com',
+    type: 'website',
+    images: [
+      {
+        url: 'https://qbitshield.com/og-image.png', // Make sure this exists in /public
+        width: 1200,
+        height: 630,
+        alt: 'QbitShield Cover Image',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'QbitShield',
+    description: 'Quantum encryption using prime numbers. Secure. Deterministic. Patent pending.',
+    images: ['https://qbitshield.com/og-image.png'],
+  },
+};
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
