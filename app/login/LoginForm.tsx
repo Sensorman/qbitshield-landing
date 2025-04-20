@@ -27,7 +27,7 @@ export default function LoginForm() {
     })
 
     if (error) {
-      setError(error.message)
+      setError('Login failed. Please check your credentials and try again.')
     } else {
       router.push('/dashboard')
     }
@@ -44,10 +44,13 @@ export default function LoginForm() {
     })
 
     if (error) {
-      console.error(`${provider} login error:`, error.message)
-      setError(error.message)
+      setError(`Error during ${provider} login. Please try again.`)
     }
   }
+
+
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">

@@ -19,7 +19,7 @@
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "preserve",
-    "types": ["react", "react-dom"],
+    "types": ["@types/react", "@types/react-dom"],
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
