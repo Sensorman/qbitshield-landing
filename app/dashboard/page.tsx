@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 
 export default async function DashboardPage() {
+  // Use cookies() directly — no need for `await` (it's synchronous now in Next.js 13+)
   const cookieStore = await cookies()
 
   const supabase = createServerClient(
@@ -13,13 +14,20 @@ export default async function DashboardPage() {
         get(name: string) {
           return cookieStore.get(name)?.value
         },
-        set() {},
-        remove() {},
+        set() {
+          // SSR environments can't persist cookies
+        },
+        remove() {
+          // SSR environments can't remove cookies
+        },
       },
     }
   )
 
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
 
   if (!user || error) {
     redirect('/login')
@@ -29,7 +37,6 @@ export default async function DashboardPage() {
   const usageRes = await fetch(`${baseUrl}/api/usage`, {
     headers: {
       'Content-Type': 'application/json',
-      // Optional: add auth header if needed
     },
     cache: 'no-store',
   })

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-
     "target": "ESNext",
     "module": "ESNext",
     "lib": [
@@ -19,7 +18,10 @@
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "preserve",
-    "types": ["@types/react", "@types/react-dom"],
+    "types": [
+      "react",
+      "react-dom"
+    ],
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {

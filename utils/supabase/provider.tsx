@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { Session, User } from '@supabase/supabase-js'
-import { supabase } from './client'
+import { createClient } from './client'
 
 type SupabaseContextType = {
   user: User | null
@@ -14,29 +14,32 @@ const SupabaseContext = createContext<SupabaseContextType>({
   session: null,
 })
 
-export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+export const SupabaseProvider = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    const fetchSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
-    }
+    const supabase = createClient()
 
-    fetchSession()
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession()
+      setSession(data.session)
+      setUser(data.session?.user ?? null)
+    }
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-    })
+    } = supabase.auth.onAuthStateChange(() => getSession())
 
-    return () => subscription.unsubscribe()
+    getSession()
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   return (
