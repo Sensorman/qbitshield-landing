@@ -20,6 +20,7 @@ export function useUser(): UseUserResult {
 
     const getUser = async () => {
       const { data, error } = await supabase.auth.getSession()
+      console.log('👤 getUser:', data.session?.user, 'error:', error)
 
       if (data?.session) {
         setUser(data.session.user)
@@ -42,6 +43,7 @@ export function useUser(): UseUserResult {
       subscription.unsubscribe()
     }
   }, [])
+
 
   return { user, session, isLoading }
 }

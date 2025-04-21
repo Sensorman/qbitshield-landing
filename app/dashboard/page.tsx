@@ -2,9 +2,11 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 
+
 export default async function DashboardPage() {
-  // Use cookies() directly — no need for `await` (it's synchronous now in Next.js 13+)
-  const cookieStore = await cookies()
+  console.log('🚀 Fetching user and usage...')
+
+  const cookieStore = await cookies() as any
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,10 +17,10 @@ export default async function DashboardPage() {
           return cookieStore.get(name)?.value
         },
         set() {
-          // SSR environments can't persist cookies
+          // SSR can't persist cookies
         },
         remove() {
-          // SSR environments can't remove cookies
+          // SSR can't remove cookies
         },
       },
     }
@@ -29,11 +31,19 @@ export default async function DashboardPage() {
     error,
   } = await supabase.auth.getUser()
 
-  if (!user || error) {
+  console.log('👤 getUser:', user, 'error:', error)
+
+  if (error) {
+    console.error('❌ Supabase getUser error:', error)
+  }
+
+  if (!user) {
+    console.warn('⚠️ No user found, redirecting to login')
     redirect('/login')
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
   const usageRes = await fetch(`${baseUrl}/api/usage`, {
     headers: {
       'Content-Type': 'application/json',
@@ -41,7 +51,10 @@ export default async function DashboardPage() {
     cache: 'no-store',
   })
 
+  console.log('📊 Usage Response Status:', usageRes.status)
+
   if (!usageRes.ok) {
+    console.error('❌ Failed to load usage data')
     throw new Error('Failed to load usage')
   }
 
