@@ -6,7 +6,7 @@ import { createServerClient } from '@supabase/ssr'
 export default async function DashboardPage() {
   console.log('🚀 Fetching user and usage...')
 
-  const cookieStore = await cookies() as any
+  const cookieStore = cookies() as any
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -42,9 +42,9 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL!
 
-  const usageRes = await fetch(`${baseUrl}/api/usage`, {
+    const usageRes = await fetch(`${baseUrl}/api/usage`, {
     headers: {
       'Content-Type': 'application/json',
     },
