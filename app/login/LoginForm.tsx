@@ -35,22 +35,19 @@ export default function LoginForm() {
     setLoading(false)
   }
 
-  const handleOAuthLogin = async (provider: Provider) => {
+  const handleOAuthLogin = async (provider: Provider): Promise<void> => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`
-      },
+      }
     })
 
     if (error) {
+      console.error(`${provider} login error:`, error.message)
       setError(`Error during ${provider} login. Please try again.`)
     }
   }
-
-
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
